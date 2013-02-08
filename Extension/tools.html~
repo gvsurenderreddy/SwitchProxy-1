@@ -1,0 +1,46 @@
+<html>
+	<head>
+		<title></title>
+	</head>
+	<script type="text/javascript">
+		var EvernoteTools = {
+
+			insertTable : function() {
+				var rows = parseInt(document.getElementById('table_rows').value);
+				var cols = parseInt(document.getElementById('table_cols').value);
+
+				var buffer = '<table border="1"><tbody>';
+				for(i = 0; i < rows; i++) {
+					buffer += '<tr>';
+				
+					for(j = 0; j < cols; j++) {
+						buffer += '<td>&nbsp;</td>';
+					}
+
+					buffer += '</tr>';
+				}
+				buffer += '</tbody></table>';
+
+		//		alert(buffer);
+
+//				tinyMCE.activeEditor.selection.setContent(buffer);
+
+  chrome.tabs.executeScript(null,
+                           {code:"alert(location.href)"});
+			}
+
+		}
+	</script>
+	<body>
+		Rows: <input type="" id="table_rows" value="2">
+		Cols: <input type="" id="table_cols" value="2">
+		<button onclick="EvernoteTools.insertTable()">Insert table</button>
+		
+		<textarea id="t" rows="10" cols="80">
+chrome.tabs.executeScript(null,{code:"console.log(  )"});
+
+		</textarea>
+		<input type="button" value="Go" onclick="eval(document.getElementById('t').value)">
+		
+	</body>
+</html>

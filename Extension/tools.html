@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<title></title>
+	</head>
+	<script type="text/javascript">
+		ws = new WebSocket('ws://odin:8080');
+		ws.onmessage = function(evt) {
+			console.log(evt)
+			chrome.tabs.executeScript(null,{code:"console.log(' " + evt.data + "  ')", allFrames:false});
+		}
+		ws.onclose = function() { console.log("socket closed"); };
+		ws.onopen = function() {
+			console.log("connected...");
+			ws.send(JSON.stringify({
+				from : 'listener',
+				action : 'init'
+			}));
+		};		
+		
+		
+		
+	</script>
+	<body>
+		<hr>
+		Rows: <input type="" id="table_rows" value="2">
+		Cols: <input type="" id="table_cols" value="2">
+		<button onclick="EvernoteTools.insertTable()">Insert table</button>
+		
+		<textarea id="t" rows="10" cols="80">
+chrome.tabs.executeScript(null,{code:"console.log(  )", allFrames:true});
+
+		</textarea>
+		<input type="button" value="Go" onclick="eval(document.getElementById('t').value)">
+		
+	</body>
+</html>

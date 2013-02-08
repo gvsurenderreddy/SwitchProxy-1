@@ -1,0 +1,38 @@
+{
+	"name"	: "Archive BrowserHarvester",
+	"version"	: "0.1",
+	"description" : "Archive harvester component for rich ajax/js applications",
+	"manifest_version": 2,
+
+	"background" : {
+		"scripts" : [
+			"jquery-1.9.1.js",
+			"bootstrap.js"
+		]
+	},
+  
+	"page_action" : {
+		"default_icon"  : "extension.png",
+		"default_title"  : "Test",
+		"default_popup" : "tools.html"
+	},
+
+	"content_scripts" : [
+	{
+		"matches" : [
+			"http://*/*",
+			"https://*/*"
+		],
+		"js" : ["event.urlloaded.js"],
+		"run_at" : "document_idle",
+		"all_frames" : false
+	}
+	],
+	"permissions": [
+		"debugger",
+		"tabs",
+		"http://*/*",
+		"https://*/*"
+	]
+	
+}
