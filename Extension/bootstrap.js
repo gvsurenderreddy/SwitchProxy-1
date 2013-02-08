@@ -33,6 +33,22 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     }
 });
 
+chrome.extension.onMessage.addListener(function(data, sender, sendResponse) {
+	$.ajax({
+		url: BrowserHarvester.Config.URL_STORE,
+		type: 'post',
+		data : {
+			"htmlContent" : data
+		},
+		success : function(response) {
+			// resume
+		},
+		error: function(xhr, text, err) {
+			alert([err]);
+		}
+	});
+});
+
 
 // Poll implementation
 // Spawns request to fetch rendering task form  server
@@ -53,6 +69,10 @@ $.ajax({
 			});
 
 			BrowserHarvester.Diagnostics.log("TAB-ID", tabId);
+		}
+		else {
+			// setTimeout
+			// loop
 		}
 	},
 	error: function(xhr, text, err) {
