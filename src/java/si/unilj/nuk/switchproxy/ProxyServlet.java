@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.wpg.proxy.Proxy;
 
 /**
  *
@@ -21,12 +22,12 @@ public class ProxyServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init(); //To change body of generated methods, choose Tools | Templates.
 		
-		try {
-		PrintWriter pw = new PrintWriter("/tmp/ttt");
-		pw.write("Runned");
-		pw.close();
-		}
-		catch(Exception e) {}
+		// PROTOTYPE: init proxy
+		startProxy();
+	}
+	
+	protected void startProxy() {
+		Proxy.main(new String[0]);
 	}
 	
 	/**
