@@ -12,7 +12,7 @@ public class ProxyRequestFilterSingleton {
 	private static ProxyRequestFilter instance;
 	
 	public static ProxyRequestFilter getInstance() {
-		synchronized(instance) {
+		synchronized(ProxyRequestFilterSingleton.class) {
 			if(instance == null) {
 				instance = new ProxyRequestFilter();
 				
@@ -24,7 +24,20 @@ public class ProxyRequestFilterSingleton {
 	}	
 	
 	public static void setup(ProxyRequestFilter prf) {
-		prf.getRuleSet().add(new UrlMatchRule("^http://www.twitter.com/[A-z]+$", 
-				  "var currElCount = 0; function loadMoarAndMoar() { commit(); if(document.getElementsByTagName('*').length > currElCount) { currElCount = document.getElementsByTagName('*').length; window.scrollTo(0, document.height); } setTimeout(loadMoarAndMoar, 500); } setTimeout(loadMoarAndMoar, 500);"));
+		UrlMatchRule rule = new UrlMatchRule("^http://www.twitter.com/[A-z]+$", 
+				  "var currElCount = 0; function loadMoarAndMoar() { commit(); if(document.getElementsByTagName('*').length > currElCount) { currElCount = document.getElementsByTagName('*').length; window.scrollTo(0, document.height); } setTimeout(loadMoarAndMoar, 500); } setTimeout(loadMoarAndMoar, 500);");
+		prf.getRuleSet().add(rule);
+
+		
+		// Testing
+		RenderTask rt = new RenderTask("http://twitter.com/TinaMaze", rule);
+		
+		// TEST#1 add to active tasks
+//		prf.getActiveTasks().put(rt.getId(), rt);
+	
+		// TEST#3: Empty task queue, dummy task
+		
+		// TEST#2
+//		prf.getTaskQueue().add(rt);
 	}
 }

@@ -28,7 +28,10 @@ public class ProxyRequestFilter {
 	public Queue<RenderTask> getTaskQueue() {
 		return taskQueue;
 	}
-	
+
+	public Hashtable<String, RenderTask> getActiveTasks() {
+		return activeTasks;
+	}
 	
 	// -- Proxy interface -------------------------------------------------------
 	
@@ -83,7 +86,9 @@ public class ProxyRequestFilter {
 	
 	public RenderTask nextTask() {
 		RenderTask task = taskQueue.poll();
-		activeTasks.put(task.getId(), task);
+		if(task != null) {
+			activeTasks.put(task.getId(), task);
+		}
 		
 		return task;
 	}
