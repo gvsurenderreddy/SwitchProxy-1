@@ -61,7 +61,7 @@ public class ProxyRequestFilter {
 	 * TODO, enclose to a separate type
 	 * @param url 
 	 */
-	public RenderTask process(String url, UrlMatchRule rule) {
+	public synchronized RenderTask process(String url, UrlMatchRule rule) {
 		RenderTask task = new RenderTask(url, rule);
 		taskQueue.add(task);
 		

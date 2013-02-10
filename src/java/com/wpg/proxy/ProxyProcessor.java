@@ -50,6 +50,9 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.log4j.Logger;
+import si.unilj.nuk.switchproxy.ProxyRequestFilterSingleton;
+import si.unilj.nuk.switchproxy.RenderTask;
+import si.unilj.nuk.wpgproxy.WpgProxyUtil;
 
 /**
  *
@@ -234,7 +237,19 @@ public class ProxyProcessor {
             
             HttpMessageResponse response = null;
             try {
+					// Prototype Work
+					RenderTask task =
+						ProxyRequestFilterSingleton.getInstance()
+							  .match(request.getUri().toURL().toString());
+					if(task == null) {
+					
                 response = executeRequest( request );
+						
+					}
+					else {
+						response = WpgProxyUtil.createFromTask(task);
+					}
+//                response = executeRequest( request );
             } catch( Exception e ) {
                 stopTransaction( startTimeStamp, ProxyStatistics.FAILURE );
                 logger.error("Exception while executing the request: "+ e,e);
