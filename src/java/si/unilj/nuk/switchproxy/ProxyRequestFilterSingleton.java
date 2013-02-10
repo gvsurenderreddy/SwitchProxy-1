@@ -38,6 +38,6 @@ public class ProxyRequestFilterSingleton {
 		// TEST#3: Empty task queue, dummy task
 		
 		// TEST#2
-//		prf.getTaskQueue().add(rt);
+		prf.getTaskQueue().add(rt);
 	}
 }

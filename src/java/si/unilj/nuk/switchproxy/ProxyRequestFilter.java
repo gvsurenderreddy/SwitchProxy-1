@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 
 /**
@@ -18,7 +19,7 @@ public class ProxyRequestFilter {
 	private final static Logger log = Logger.getLogger(ProxyRequestFilter.class);
 	
 	private Vector<UrlMatchRule> ruleSet = new Vector<UrlMatchRule>();
-	private Queue<RenderTask> taskQueue = new SynchronousQueue<RenderTask>();
+	private Queue<RenderTask> taskQueue = new ConcurrentLinkedQueue<RenderTask>();
 	private Hashtable<String, RenderTask> activeTasks = new Hashtable<String, RenderTask>();
 
 	public Vector<UrlMatchRule> getRuleSet() {
