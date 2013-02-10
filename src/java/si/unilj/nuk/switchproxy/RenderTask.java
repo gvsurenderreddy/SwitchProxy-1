@@ -12,12 +12,18 @@ import java.util.UUID;
  */
 public class RenderTask {
 	
-	private String url;
-	private UrlMatchRule rule;
+	/**
+	 * Flag indicating renderer should proceed with task
+	 */
+	private final boolean valid = true;
+	
 	private String id;
 	
-	private boolean complete;
+	private String url;
 	
+	private UrlMatchRule rule;
+	
+	private boolean complete;
 	
 	private String content;
 	// HEADERS!!!
