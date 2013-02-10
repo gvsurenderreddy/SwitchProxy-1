@@ -38,8 +38,8 @@ public class RendererInterfaceServlet extends HttpServlet {
 			}
 		}
 	}
-	private static class ContentStoreResponse {
-		
+	private static class ContentStoreResponse extends DummyTask {
+		private String message = "OK";
 	}
 	
 	private Gson gson = new Gson();
@@ -87,6 +87,21 @@ public class RendererInterfaceServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			  throws ServletException, IOException {
+		PrintWriter out = response.getWriter();
+		try {
+			String content = request.getParameter("content");
+			String id = request.getParameter("id");
+
+			ProxyRequestFilterSingleton.getInstance().passContent(id, content);
+		
+			out.println(gson.toJson(new ContentStoreResponse()));
+		}
+		catch(Exception e) {
+			out.println(gson.toJson(new ExceptionTask(e)));
+		}
+		finally {			
+			out.close();
+		}		
 	}
 
 	/**

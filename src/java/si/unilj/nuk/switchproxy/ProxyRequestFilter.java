@@ -99,11 +99,17 @@ public class ProxyRequestFilter {
 	 * @param id
 	 * @param content 
 	 */
-	public void passContent(String id, String content) {
-		activeTasks.get(id).setContent(content);
+	public synchronized void passContent(String id, String content) {
+		try {
+			activeTasks.get(id).setContent(content);
+		}
+		catch(Exception e) {
+			// Invalid id???
+		}
 		
 		// resume all waiting threads
-		notifyAll();
+		
+		notify();
 	}
 	
 }
