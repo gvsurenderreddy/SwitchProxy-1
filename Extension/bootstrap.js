@@ -42,8 +42,9 @@ var BrowserHarvester = {
 					BrowserHarvester.CurrentTaskScript = null;
 					BrowserHarvester.CurrentTaskId = null;			
 
-					// resume
 					// close tabl, cleanup
+					chrome.tabs.remove(BrowserHarvester.CurrentRenderingTab.id);
+					BrowserHarvester.Service.poll();
 				},
 				error: function(xhr, text, err) {
 					alert([err]);
@@ -73,6 +74,8 @@ var BrowserHarvester = {
 						// open tab with url
 						var tabId = chrome.tabs.create({
 							url : task.url
+						}, function(tab) {
+							BrowserHarvester.CurrentRenderingTab = tab;
 						});
 
 						BrowserHarvester.Log.debug("TAB-ID", tabId);
@@ -93,6 +96,7 @@ var BrowserHarvester = {
 	TaskScriptQueue : {},
 	CurrentTaskScript : null,
 	CurrentTaskId : null,
+	CurrentRenderingTab : null,
 
 	start : function() {
 		BrowserHarvester.log("Browser renderer started");
