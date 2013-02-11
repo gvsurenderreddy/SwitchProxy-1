@@ -21,10 +21,18 @@ public class ProxyRequestFilter {
 	private Vector<UrlMatchRule> ruleSet = new Vector<UrlMatchRule>();
 	private Queue<RenderTask> taskQueue = new ConcurrentLinkedQueue<RenderTask>();
 	private Hashtable<String, RenderTask> activeTasks = new Hashtable<String, RenderTask>();
+	
+	private Vector<RenderTask> commitedTasks = new Vector<RenderTask>();
 
 	public Vector<UrlMatchRule> getRuleSet() {
 		return ruleSet;
 	}
+
+	public Vector<RenderTask> getCommitedTasks() {
+		return commitedTasks;
+	}
+	
+	
 
 	public Queue<RenderTask> getTaskQueue() {
 		return taskQueue;
@@ -105,7 +113,10 @@ public class ProxyRequestFilter {
 	 */
 	public void passContent(String id, String content) {
 		try {
-			activeTasks.get(id).setContent(content);
+			RenderTask task = activeTasks.get(id);
+			task.setContent(content);
+			
+			commitedTasks.add(task);
 		}
 		catch(Exception e) {
 			// Invalid id???
