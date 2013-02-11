@@ -206,7 +206,7 @@ public class Proxy extends Thread {
             } catch( Exception ex ) {
                 logger.warn("Error creating a temporary file for proxy keystore ssl use: Exception: "+ ex);
             }
-            Proxy proxy = new Proxy( java.net.InetAddress.getByName("127.0.0.1"), 9100, 50, keyFile.getPath(), "spassword".toCharArray(), "kpassword".toCharArray() );
+            Proxy proxy = new Proxy( java.net.InetAddress.getByName("127.0.0.1"), 8888, 50, keyFile.getPath(), "spassword".toCharArray(), "kpassword".toCharArray() );
             //Proxy proxy = new Proxy( java.net.InetAddress.getByName("192.168.0.11"), 8080, 50, keyFile.getPath(), "spassword".toCharArray(), "kpassword".toCharArray() );
             ProxyRegistry.enableStatusBrowser(true);
             proxy.start();

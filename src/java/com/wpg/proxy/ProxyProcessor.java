@@ -238,6 +238,7 @@ public class ProxyProcessor {
             HttpMessageResponse response = null;
             try {
 					// Prototype Work
+					if(true) {
 					RenderTask task =
 						ProxyRequestFilterSingleton.getInstance()
 							  .match(request.getUri().toURL().toString());
@@ -249,7 +250,10 @@ public class ProxyProcessor {
 					else {
 						response = WpgProxyUtil.createFromTask(task);
 					}
-//                response = executeRequest( request );
+					}
+					else {
+                response = executeRequest( request );
+					}
             } catch( Exception e ) {
                 stopTransaction( startTimeStamp, ProxyStatistics.FAILURE );
                 logger.error("Exception while executing the request: "+ e,e);

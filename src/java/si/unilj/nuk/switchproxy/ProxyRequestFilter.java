@@ -61,26 +61,30 @@ public class ProxyRequestFilter {
 	 * TODO, enclose to a separate type
 	 * @param url 
 	 */
-	public synchronized RenderTask process(String url, UrlMatchRule rule) {
+	public RenderTask process(String url, UrlMatchRule rule) {
 		RenderTask task = new RenderTask(url, rule);
 		taskQueue.add(task);
 		
 		while(true) {
 			try {
-				log.info(String.format("Url processing .. %s", url));
-				Thread.currentThread().wait();
+				log.info(String.format("Url(%s) tasked, waiting for rendering to process it", url));
+				
+//				wait();
+				
+				// temporary alternative
+				Thread.sleep(1000);
 			}
 			catch(InterruptedException e) {
-				log.info(String.format("Url preoce .. %s", url));
+				log.info(String.format("Thread awoken."));
 			}
 			
 			if(task.isComplete()) {
+				log.info(String.format("Task completed, passing content to caller."));
+				
 				activeTasks.remove(task.getId());
 				return task;
 			}
 		}
-		
-		
 	}
 	
 	// -- Renderer interface ----------------------------------------------------
@@ -99,7 +103,7 @@ public class ProxyRequestFilter {
 	 * @param id
 	 * @param content 
 	 */
-	public synchronized void passContent(String id, String content) {
+	public void passContent(String id, String content) {
 		try {
 			activeTasks.get(id).setContent(content);
 		}
@@ -109,7 +113,7 @@ public class ProxyRequestFilter {
 		
 		// resume all waiting threads
 		
-		notify();
+//		notify();
 	}
 	
 }

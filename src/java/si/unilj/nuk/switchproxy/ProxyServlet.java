@@ -11,93 +11,77 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.wpg.proxy.Proxy;
+import javax.servlet.annotation.WebServlet;
+import si.unilj.nuk.wpgproxy.ProxySingleton;
 
 /**
  *
  * @author mitja
  */
+@WebServlet(name = "ProxyServlet", urlPatterns = {"/proxy"})
 public class ProxyServlet extends HttpServlet {
 
 	@Override
 	public void init() throws ServletException {
 		super.init(); //To change body of generated methods, choose Tools | Templates.
-		
-		// PROTOTYPE: init proxy
-		startProxy();
+//		ProxySingleton.getInstance().start();
 	}
+
+//	@Override
+//	public void destroy() {
+//		super.destroy(); //To change body of generated methods, choose Tools | Templates.
+//		
+////		ProxySingleton.getInstance().stop();
+//	}
+	
+	
 	
 	protected void startProxy() {
 		Proxy.main(new String[0]);
 	}
-	
-	/**
-	 * Processes requests for both HTTP
-	 * <code>GET</code> and
-	 * <code>POST</code> methods.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-			  throws ServletException, IOException {
-		response.setContentType("text/html;charset=UTF-8");
-		PrintWriter out = response.getWriter();
-		try {
-			/* TODO output your page here. You may use following sample code. */
-			out.println("<!DOCTYPE html>");
-			out.println("<html>");
-			out.println("<head>");
-			out.println("<title>Servlet ProxyServlet</title>");			
-			out.println("</head>");
-			out.println("<body>");
-			out.println("<h1>Servlet ProxyServlet at " + request.getContextPath() + "</h1>");
-			out.println("</body>");
-			out.println("</html>");
-		} finally {			
-			out.close();
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		if("restart".equals(req.getParameter("action"))) {
+			int port = -1;
+			try {
+				port = Integer.parseInt(req.getParameter("port"));
+			}
+			catch(Exception e) {}
+			
+			ProxySingleton proxy = ProxySingleton.getInstance();
+			if(port > 0) {
+				proxy.setPort(port);
+			}
+			proxy.restart();
+			
+			resp.getOutputStream().println("Proxy restarted on port(-1 not changed): " + port);
+			resp.getOutputStream().close();
+		}
+		else if("start".equals(req.getParameter("action"))) {
+			int port = -1;
+			try {
+				port = Integer.parseInt(req.getParameter("port"));
+			}
+			catch(Exception e) {}
+			
+			ProxySingleton proxy = ProxySingleton.getInstance();
+			if(port > 0) {
+				proxy.setPort(port);
+			}
+			proxy.start();
+			
+			resp.getOutputStream().println("Proxy restarted on port(-1 not changed): " + port);
+			resp.getOutputStream().close();
+		}
+		else if("main".equals(req.getParameter("action"))) {
+			startProxy();
+			
+			resp.getOutputStream().println("Main - proxy started");
+			resp.getOutputStream().close();
 		}
 	}
-
-	// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-	/**
-	 * Handles the HTTP
-	 * <code>GET</code> method.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			  throws ServletException, IOException {
-		processRequest(request, response);
-	}
-
-	/**
-	 * Handles the HTTP
-	 * <code>POST</code> method.
-	 *
-	 * @param request servlet request
-	 * @param response servlet response
-	 * @throws ServletException if a servlet-specific error occurs
-	 * @throws IOException if an I/O error occurs
-	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			  throws ServletException, IOException {
-		processRequest(request, response);
-	}
-
-	/**
-	 * Returns a short description of the servlet.
-	 *
-	 * @return a String containing servlet description
-	 */
-	@Override
-	public String getServletInfo() {
-		return "Short description";
-	}// </editor-fold>
+	
+	
+	
 }
