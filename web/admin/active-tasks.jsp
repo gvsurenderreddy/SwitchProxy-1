@@ -4,6 +4,15 @@
 <%@page import="java.util.Hashtable"%>
 <%@page import="si.unilj.nuk.switchproxy.ProxyRequestFilterSingleton"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+
+	if("cancel".equals(request.getParameter("action"))) {
+		ProxyRequestFilterSingleton.getInstance().passContent(request.getParameter("uuid"), "Canceled!!");
+		
+		response.sendRedirect("active-tasks.jsp");
+	}
+	
+%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -16,6 +25,7 @@
 				<tr>
 					<th witdh="200">UUID</th>
 					<th>Task description</th>
+					<th></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -24,7 +34,11 @@
 					Hashtable<String, RenderTask> hs = ProxyRequestFilterSingleton.getInstance().getActiveTasks();
 					for(Map.Entry e : hs.entrySet()) {
 						%>
-						<tr><td><%= e.getKey()%></td><td><%= e.getValue()%></td></tr>
+						<tr>
+							<td><%= e.getKey()%></td>
+							<td><%= e.getValue()%></td>
+							<td><a href="?action=cancel&uuid=<%= e.getKey()%>">Cancel</a></td>
+						</tr>
 						<%
 					}
 
