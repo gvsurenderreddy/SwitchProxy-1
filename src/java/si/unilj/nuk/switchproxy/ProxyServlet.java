@@ -25,6 +25,8 @@ public class ProxyServlet extends HttpServlet {
 	public void init() throws ServletException {
 		super.init(); //To change body of generated methods, choose Tools | Templates.
 //		ProxySingleton.getInstance().start();
+		
+//		startProxy();
 	}
 
 //	@Override

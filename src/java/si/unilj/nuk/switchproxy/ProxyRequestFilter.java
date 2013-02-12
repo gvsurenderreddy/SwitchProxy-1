@@ -73,12 +73,11 @@ public class ProxyRequestFilter {
 		RenderTask task = new RenderTask(url, rule);
 		taskQueue.add(task);
 		
+		log.info(String.format("Url(%s) tasked, waiting for rendering to process it", url));
+		
 		while(true) {
 			try {
-				log.info(String.format("Url(%s) tasked, waiting for rendering to process it", url));
-				
 //				wait();
-				
 				// temporary alternative
 				Thread.sleep(1000);
 			}
