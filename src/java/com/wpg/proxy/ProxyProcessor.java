@@ -162,7 +162,7 @@ public class ProxyProcessor {
                 request = parseRequest(client);
             } catch (Exception e) {
                 stopTransaction( startTimeStamp, ProxyStatistics.FAILURE );
-                logger.error("Exception while parsing the request: "+ e,e);
+//                logger.error("Exception while parsing the request: "+ e,e);
                 runHandlers(ProxyRegistry.getHandlers(),e);
                 client.close();
                 return;
