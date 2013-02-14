@@ -1,3 +1,12 @@
+<%@page import="java.util.Locale.Builder"%>
+<%@page import="java.io.FileOutputStream"%>
+<%@page import="org.apache.commons.io.FileUtils"%>
+<%@page import="javax.xml.XMLConstants"%>
+<%@page import="nu.xom.Attribute"%>
+<%@page import="nu.xom.Text"%>
+<%@page import="nu.xom.Document"%>
+<%@page import="nu.xom.Serializer"%>
+<%@page import="nu.xom.Element"%>
 <%@page import="java.util.Vector"%>
 <%@page import="si.unilj.nuk.switchproxy.UrlMatchRule"%>
 <%@page import="si.unilj.nuk.switchproxy.ProxyRequestFilterSingleton"%>
@@ -13,7 +22,40 @@
 	else if("remove".equals(request.getParameter("action"))) {
 		ruleSet.remove(Integer.parseInt(request.getParameter("index")));
 	}
+	else if("store".equals(request.getParameter("action"))) {
+		Element xRuleset = new Element("ruleset");
+		Document doc = new Document(xRuleset);
+		
+			for(UrlMatchRule r : ruleSet) {
+			Element xRule = new Element("rule");
+			xRuleset.appendChild(xRule);
+			
+				Element xUrlPattern = new Element("url-pattern");
+				xRule.appendChild(xUrlPattern);
+				
+					xUrlPattern.appendChild(r.getUrlPattern().toString());
+					
+				Element xClientScript = new Element("client-script");
+				xRule.appendChild(xClientScript);
+				
+					xClientScript.appendChild(new Text(r.getClientScript()));
+					xClientScript.addAttribute(new Attribute("xml:space", XMLConstants.XML_NS_URI, "preserve"));
+			}
+		
 	
+			
+			
+		Serializer serializer = new Serializer(
+			new FileOutputStream(pageContext.getServletContext().getRealPath("WEB-INF/ruleset.xml"), false),
+			"UTF-8");
+		serializer.setIndent(3);
+		serializer.setLineSeparator("\r\n");
+		serializer.write(doc);
+		serializer.flush();			
+	
+		response.sendRedirect("ruleset.jsp");
+	}
+
 %>
 <!DOCTYPE html>
 <html>
@@ -45,9 +87,6 @@
 					}
 					
 				%>
-				<tr>
-					
-				</tr>
 			</tbody>
 		</table>
 		<hr>
@@ -57,5 +96,8 @@
 			<textarea cols="100" rows="10" name="script"></textarea><br>
 			<input type="submit">
 		</form>
+		<hr>
+		<button onclick="location.href='?action=store'">Save</button>
+		<button onclick="location.href='?action=load'">Load</button>
 	</body>
 </html>
