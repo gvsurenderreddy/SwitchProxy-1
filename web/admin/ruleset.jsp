@@ -1,4 +1,6 @@
-<%@page import="java.util.Locale.Builder"%>
+<%@page import="nu.xom.XPathContext"%>
+<%@page import="nu.xom.Nodes"%>
+<%@page import="nu.xom.Builder"%>
 <%@page import="java.io.FileOutputStream"%>
 <%@page import="org.apache.commons.io.FileUtils"%>
 <%@page import="javax.xml.XMLConstants"%>
@@ -54,6 +56,25 @@
 		serializer.flush();			
 	
 		response.sendRedirect("ruleset.jsp");
+	}
+	else if("load".equals(request.getParameter("action"))) {
+		try {
+			Builder parse = new Builder(false);
+			Document doc = parse.build(pageContext.getServletContext().getResourceAsStream("WEB-INF/ruleset.xml"));
+
+			ruleSet.clear();
+			
+			Nodes n = doc.query("/ruleset/rule");
+			for(int i = 0; i < n.size(); i++) {
+				String urlPattern = n.get(i).query("./url-pattern").get(0).getValue();
+				String clientScript = n.get(i).query("./client-script").get(0).getValue();
+				
+				ruleSet.add(new UrlMatchRule(urlPattern, clientScript));
+			}
+		}
+		catch(Exception e) {
+			response.getWriter().print(e.toString());
+		}
 	}
 
 %>
