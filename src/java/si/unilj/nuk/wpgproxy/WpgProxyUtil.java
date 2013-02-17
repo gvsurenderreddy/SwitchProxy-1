@@ -5,6 +5,7 @@
 package si.unilj.nuk.wpgproxy;
 
 import com.wpg.proxy.HttpMessageResponse;
+import java.util.Map;
 import si.unilj.nuk.switchproxy.RenderTask;
 
 /**
@@ -19,8 +20,18 @@ public class WpgProxyUtil {
 		response.setStartLine("HTTP/1.1 200 OK");
 		response.setStatusCode(200);
 		response.setReasonPhrase("OK");
-		response.addHeader("Content-Type:", "text/html");
-		response.addHeader("Transfer-Encoding", "chunked");		
+	
+		for(Map.Entry<String, String> p : task.getHeaders().entrySet()) {
+			String key = p.getKey();
+			if(key.equals("Content-Encoding")) {
+				key = "X-ProxyRemove-Content-Encoding";
+			}
+			
+			response.addHeader(key, p.getValue());
+		}
+		
+//		response.addHeader("Content-Type:", "text/html");
+//		response.addHeader("Transfer-Encoding", "chunked");		
 		
 		return response;
 	}

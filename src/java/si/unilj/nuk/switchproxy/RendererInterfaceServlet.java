@@ -5,9 +5,15 @@
 package si.unilj.nuk.switchproxy;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -89,10 +95,22 @@ public class RendererInterfaceServlet extends HttpServlet {
 			  throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		try {
-			String content = request.getParameter("content");
-			String id = request.getParameter("id");
+			JsonElement root = new JsonParser().parse(request.getReader());
+			
+			JsonObject obj = root.getAsJsonObject();
+			
+			// json 
+			String content = obj.get("content").getAsString();
+			String id = obj.get("id").getAsString();
+			
+			HashMap<String, String> headers = new HashMap<String, String>();
+			JsonArray headersArray = obj.get("headers").getAsJsonArray();
+			for(int i = 0; i < headersArray.size(); i++) {
+				JsonObject pair = headersArray.get(i).getAsJsonObject();
+				headers.put(pair.get("name").getAsString(), pair.get("value").getAsString());
+			}
 
-			ProxyRequestFilterSingleton.getInstance().passContent(id, content);
+			ProxyRequestFilterSingleton.getInstance().passContent(id, content, headers);
 		
 			out.println(gson.toJson(new ContentStoreResponse()));
 		}

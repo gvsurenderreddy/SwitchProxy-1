@@ -4,6 +4,7 @@
  */
 package si.unilj.nuk.switchproxy;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Queue;
 import java.util.concurrent.SynchronousQueue;
@@ -110,9 +111,10 @@ public class ProxyRequestFilter {
 	 * @param id
 	 * @param content 
 	 */
-	public void passContent(String id, String content) {
+	public void passContent(String id, String content, HashMap<String, String> headers) {
 		try {
 			RenderTask task = activeTasks.get(id);
+			task.setHeaders(headers);
 			task.setContent(content);
 			
 			commitedTasks.add(task);

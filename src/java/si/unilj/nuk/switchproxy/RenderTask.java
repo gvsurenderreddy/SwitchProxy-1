@@ -4,6 +4,7 @@
  */
 package si.unilj.nuk.switchproxy;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -25,8 +26,8 @@ public class RenderTask {
 	
 	private boolean complete;
 	
-	private String content;
-	// HEADERS!!!
+	private String content = null;
+	private HashMap<String, String> headers = new HashMap<String, String>();
 
 	public RenderTask(String url, UrlMatchRule rule) {
 		this.url = url;
@@ -58,6 +59,18 @@ public class RenderTask {
 
 	public String getContent() {
 		return content;
+	}
+
+	public HashMap<String, String> getHeaders() {
+		return headers;
+	}
+
+	public void setHeaders(HashMap<String, String> headers) {
+		this.headers = headers;
+	}
+	
+	public void addHeaderLine(String key, String value) {
+		headers.put(key, value);
 	}
 
 	@Override
