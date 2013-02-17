@@ -34,6 +34,7 @@ var BrowserHarvester = {
 		commit : function(options) {
 //			var content = document.getElementsByTagName('html')[0].innerHTML;
 			var data = {
+				url : location.href,
 				content : BrowserHarvester.ClientScript.serializeDOM(),
 				headers : [],
 				metadata : {}

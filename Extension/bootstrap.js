@@ -30,10 +30,13 @@ var BrowserHarvester = {
 		 * Commits operation to server
 		 */
 		commit : function(data) {
-			// compile headers
-			if(BrowserHarvester.ResponseObject != null) {
-				BrowserHarvester.Log.info("Compiling headers.." + BrowserHarvester.ResponseObject.responseHeaders);
-				data.headers = BrowserHarvester.ResponseObject.responseHeaders;
+			// selecting headers
+			for(var i = 0; i < BrowserHarvester.Responses.length; i++) {
+				var r = BrowserHarvester.Responses[i];
+
+				if(r.url == data.url) {
+					data.headers = r.responseHeaders;
+				}
 			}
 
 			$.ajax({
@@ -60,7 +63,7 @@ var BrowserHarvester = {
 					BrowserHarvester.CurrentTaskScriptInjected = false;
 					BrowserHarvester.CurrentRenderingTab = null;
 					BrowserHarvester.CurrentTaskUrl = null;
-					BrowserHarvester.ResponseObject = null;
+					BrowserHarvester.Responses = [];
 
 					BrowserHarvester.Service.poll();
 				},
@@ -120,7 +123,7 @@ var BrowserHarvester = {
 	CurrentRenderingTab : null,
 	CurrentTaskScriptInjected: false,
 	CurrentTaskUrl : null,
-	ResponseObject: null,
+	Responses: [],
 
 	start : function() {
 		BrowserHarvester.log("Browser renderer started");
@@ -151,9 +154,7 @@ var BrowserHarvester = {
 		});
 
 		chrome.webRequest.onHeadersReceived.addListener(function(response) {
-			if(response.url == BrowserHarvester.CurrentTaskUrl) {
-				BrowserHarvester.ResponseObject = response;
-			}
+			BrowserHarvester.Responses.push(response);			
 		}, {urls:["<all_urls>"]}, ["responseHeaders"]);
 
 		BrowserHarvester.Service.poll();
