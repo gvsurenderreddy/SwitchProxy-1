@@ -8,7 +8,7 @@
   */
 var BrowserHarvester = {
 	ClientScript : {
-		serializedDOM : function() {
+		serializeDOM : function() {
 			var roots = document.childNodes;
 			var buffer = "";
 			for(var i = 0; i < roots.length; i++) {
@@ -34,7 +34,7 @@ var BrowserHarvester = {
 		commit : function(options) {
 //			var content = document.getElementsByTagName('html')[0].innerHTML;
 			var data = {
-				content : BrowserHarvester.ClientScript.serializedDOM(),
+				content : BrowserHarvester.ClientScript.serializeDOM(),
 				headers : {},
 				metadata : {}
 			}

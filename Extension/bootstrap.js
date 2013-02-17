@@ -30,16 +30,26 @@ var BrowserHarvester = {
 		 * Commits operation to server
 		 */
 		commit : function(data) {
+			// compile headers
+			if(BrowserHarvester.ResponseObject != null) {
+				BrowserHarvester.Log.info("Compiling headers.." + BrowserHarvester.ResponseObject.responseHeaders);
+				data.headers = BrowserHarvester.ResponseObject.responseHeaders;
+			}
+
 			$.ajax({
 				url: BrowserHarvester.Config.URL_STORE,
 				type: 'post',
-				data : {
+				data : JSON.stringify({
 					"content"	: data.content,
 					"id"		: BrowserHarvester.CurrentTaskId,
 					"headers"	: data.headers,
 					"metadata"	: data.metadata
-				},
-				contentType : "application/x-www-form-urlencoded; charset=utf-8",
+				}),
+
+//				contentType : "application/x-www-form-urlencoded; charset=utf-8",
+				contentType : "application/json; charset=utf-8",
+				dataType: "json",
+
 				success : function(response) {
 					// close tabl, cleanup
 					chrome.tabs.remove(BrowserHarvester.CurrentRenderingTab.id);
@@ -49,10 +59,13 @@ var BrowserHarvester = {
 					BrowserHarvester.CurrentTaskId = null;
 					BrowserHarvester.CurrentTaskScriptInjected = false;
 					BrowserHarvester.CurrentRenderingTab = null;
+					BrowserHarvester.CurrentTaskUrl = null;
+					BrowserHarvester.ResponseObject = null;
 
 					BrowserHarvester.Service.poll();
 				},
 				error: function(xhr, text, err) {
+					// TODO
 					alert([err]);
 				}
 			});
@@ -76,6 +89,7 @@ var BrowserHarvester = {
 						// store script which would be executed when page is fully rendered
 						BrowserHarvester.CurrentTaskScript = task.rule.clientScript;
 						BrowserHarvester.CurrentTaskId = task.id;
+						BrowserHarvester.CurrentTaskUrl = task.url;
 
 						// open tab with url
 						var tabId = chrome.tabs.create({
@@ -105,6 +119,8 @@ var BrowserHarvester = {
 	CurrentTaskId : null,
 	CurrentRenderingTab : null,
 	CurrentTaskScriptInjected: false,
+	CurrentTaskUrl : null,
+	ResponseObject: null,
 
 	start : function() {
 		BrowserHarvester.log("Browser renderer started");
@@ -132,7 +148,13 @@ var BrowserHarvester = {
 		        	code:BrowserHarvester.CurrentTaskScript
 		        });
 		    }
-		});		
+		});
+
+		chrome.webRequest.onHeadersReceived.addListener(function(response) {
+			if(response.url == BrowserHarvester.CurrentTaskUrl) {
+				BrowserHarvester.ResponseObject = response;
+			}
+		}, {urls:["<all_urls>"]}, ["responseHeaders"]);
 
 		BrowserHarvester.Service.poll();
 	},
