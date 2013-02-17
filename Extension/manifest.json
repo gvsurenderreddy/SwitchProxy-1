@@ -23,7 +23,10 @@
 			"http://*/*",
 			"https://*/*"
 		],
-		"js" : ["event.urlloaded.js"],
+		"js" : [
+			"jquery-1.9.1.js",
+			"event.urlloaded.js"
+		],
 		"run_at" : "document_idle",
 		"all_frames" : false
 	}

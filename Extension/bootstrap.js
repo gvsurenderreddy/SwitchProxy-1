@@ -34,16 +34,22 @@ var BrowserHarvester = {
 				url: BrowserHarvester.Config.URL_STORE,
 				type: 'post',
 				data : {
-					"content" : data,
-					"id" : BrowserHarvester.CurrentTaskId
+					"content"	: data.content,
+					"id"		: BrowserHarvester.CurrentTaskId,
+					"headers"	: data.headers,
+					"metadata"	: data.metadata
 				},
+				contentType : "application/x-www-form-urlencoded; charset=utf-8",
 				success : function(response) {
-					// Reset
-					BrowserHarvester.CurrentTaskScript = null;
-					BrowserHarvester.CurrentTaskId = null;			
-
 					// close tabl, cleanup
 					chrome.tabs.remove(BrowserHarvester.CurrentRenderingTab.id);
+
+					// Reset
+					BrowserHarvester.CurrentTaskScript = null;
+					BrowserHarvester.CurrentTaskId = null;
+					BrowserHarvester.CurrentTaskScriptInjected = false;
+					BrowserHarvester.CurrentRenderingTab = null;
+
 					BrowserHarvester.Service.poll();
 				},
 				error: function(xhr, text, err) {
@@ -87,7 +93,8 @@ var BrowserHarvester = {
 					}
 				},
 				error: function(xhr, text, err) {
-					alert([xhr, err]);
+					BrowserHarvester.Log.error("Error while polling request", [xhr, text, err]);
+					setTimeout(BrowserHarvester.Service.poll, 10000);
 				}
 			});			
 		}
@@ -97,6 +104,7 @@ var BrowserHarvester = {
 	CurrentTaskScript : null,
 	CurrentTaskId : null,
 	CurrentRenderingTab : null,
+	CurrentTaskScriptInjected: false,
 
 	start : function() {
 		BrowserHarvester.log("Browser renderer started");
@@ -112,6 +120,11 @@ var BrowserHarvester = {
 		chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 			// Execute some script when the page is fully (DOM) ready
 		    if (changeInfo.status == 'complete') {
+		    	// No need for annother recursive injection
+		    	if(BrowserHarvester.CurrentTaskScriptInjected)	return;
+
+		    	BrowserHarvester.CurrentTaskScriptInjected = true;
+
 		    	BrowserHarvester.Log.info("DOM ready, injecting script.");
 		    	BrowserHarvester.Log.debug(BrowserHarvester.CurrentTaskScript);
 
