@@ -35,7 +35,7 @@ var BrowserHarvester = {
 //			var content = document.getElementsByTagName('html')[0].innerHTML;
 			var data = {
 				content : BrowserHarvester.ClientScript.serializeDOM(),
-				headers : {},
+				headers : [],
 				metadata : {}
 			}
 
