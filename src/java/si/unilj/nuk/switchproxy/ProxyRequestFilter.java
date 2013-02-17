@@ -113,6 +113,8 @@ public class ProxyRequestFilter {
 	 */
 	public void passContent(String id, String content, HashMap<String, String> headers) {
 		try {
+			log.info("Commiting task: " + id);
+			
 			RenderTask task = activeTasks.get(id);
 			task.setHeaders(headers);
 			task.setContent(content);

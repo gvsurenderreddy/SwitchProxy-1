@@ -1,3 +1,4 @@
+<%@page import="java.util.HashMap"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="si.unilj.nuk.switchproxy.RenderTask"%>
@@ -7,7 +8,11 @@
 <%
 
 	if("cancel".equals(request.getParameter("action"))) {
-		ProxyRequestFilterSingleton.getInstance().passContent(request.getParameter("uuid"), "Canceled!!");
+		HashMap<String, String> headers = new HashMap<String, String>();
+		headers.put("Content-Type", "text/html");
+		headers.put("Transfer-Encoding", "chunked");
+		
+		ProxyRequestFilterSingleton.getInstance().passContent(request.getParameter("uuid"), "Canceled!!", headers);
 		
 		response.sendRedirect("active-tasks.jsp");
 	}

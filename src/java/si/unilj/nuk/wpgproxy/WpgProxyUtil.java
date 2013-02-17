@@ -21,17 +21,21 @@ public class WpgProxyUtil {
 		response.setStatusCode(200);
 		response.setReasonPhrase("OK");
 	
-		for(Map.Entry<String, String> p : task.getHeaders().entrySet()) {
-			String key = p.getKey();
-			if(key.equals("Content-Encoding")) {
-				key = "X-ProxyRemove-Content-Encoding";
+		if(task.getHeaders().size() > 0) {
+			for(Map.Entry<String, String> p : task.getHeaders().entrySet()) {
+				String key = p.getKey();
+				if(key.toLowerCase().equals("content-encoding") ||
+					key.toLowerCase().equals("content-length")) {
+					key = "X-ProxyRemove-" + key;
+				}
+
+				response.addHeader(key, p.getValue());
 			}
-			
-			response.addHeader(key, p.getValue());
 		}
-		
-//		response.addHeader("Content-Type:", "text/html");
-//		response.addHeader("Transfer-Encoding", "chunked");		
+		else {
+			response.addHeader("Content-Type", "text/html");
+			response.addHeader("Transfer-Encoding", "chunked");		
+		}
 		
 		return response;
 	}

@@ -18,6 +18,7 @@
 					<th witdh="200">UUID</th>
 					<th>URL</th>
 					<th>Content-length</th>
+					<th>Headers</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -28,11 +29,17 @@
 					
 					int index = 0;
 					for(RenderTask t : commitedTasks) {
+						StringBuilder buff = new StringBuilder();
+						for(Entry<String, String> p : t.getHeaders().entrySet()) {
+							buff.append(p.getKey() + ": " + p.getValue() + "\n");
+						}
+						
 						%>
 						<tr>
 							<td><%= t.getId() %></td>
 							<td><%= t.getUrl() %></td>
 							<td><%= t.getContent().length() %></td>
+							<td><pre><%= buff.toString() %></pre></td>
 							<td><a href="task-content.jsp?index=<%= index++ %>">Ogled vsebine</a></td>
 						</tr>
 						<%
