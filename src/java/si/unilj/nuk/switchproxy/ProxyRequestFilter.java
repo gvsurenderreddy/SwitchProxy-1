@@ -55,6 +55,8 @@ public class ProxyRequestFilter {
 	 * @return 
 	 */
 	public RenderTask match(String url) {
+		log.debug(String.format("Matching url with rules", url));
+		
 		for(UrlMatchRule r : ruleSet) {
 			if(r.isMatched(url)) {
 				return process(url, r);
@@ -98,8 +100,12 @@ public class ProxyRequestFilter {
 	// -- Renderer interface ----------------------------------------------------
 	
 	public RenderTask nextTask() {
+		log.debug("Client asks for new task.");
+		
 		RenderTask task = taskQueue.poll();
 		if(task != null) {
+			log.debug("New task poped.");
+			
 			activeTasks.put(task.getId(), task);
 		}
 		
@@ -122,11 +128,10 @@ public class ProxyRequestFilter {
 			commitedTasks.add(task);
 		}
 		catch(Exception e) {
-			// Invalid id???
+			log.error("Error while commiting content: ", e);
 		}
 		
 		// resume all waiting threads
-		
 //		notify();
 	}
 	

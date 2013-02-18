@@ -20,6 +20,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
 
 /**
  *	REST interface for rendering task polling mechanism
@@ -48,6 +49,8 @@ public class RendererInterfaceServlet extends HttpServlet {
 		private String message = "OK";
 	}
 	
+	private final static Logger log = Logger.getLogger(RendererInterfaceServlet.class);
+	
 	private Gson gson = new Gson();
 
 	/**
@@ -63,6 +66,8 @@ public class RendererInterfaceServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			  throws ServletException, IOException {
+		log.debug("Task poll");
+		
 		response.setContentType("text/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		try {
@@ -70,10 +75,10 @@ public class RendererInterfaceServlet extends HttpServlet {
 			if(o == null) {
 				o = new DummyTask();
 			}
-			
 			out.println(gson.toJson(o));
 		}
 		catch(Exception e) {
+			log.error("Error while getting new task", e);
 			out.println(gson.toJson(new ExceptionTask(e)));
 		}
 		finally {			
@@ -95,26 +100,33 @@ public class RendererInterfaceServlet extends HttpServlet {
 			  throws ServletException, IOException {
 		PrintWriter out = response.getWriter();
 		try {
-			JsonElement root = new JsonParser().parse(request.getReader());
+			log.info("Commiting executed task");
 			
+			JsonElement root = new JsonParser().parse(request.getReader());
 			JsonObject obj = root.getAsJsonObject();
 			
 			// json 
 			String content = obj.get("content").getAsString();
 			String id = obj.get("id").getAsString();
 			
+			log.info("Result parsed, Task id: " + id);
+			
 			HashMap<String, String> headers = new HashMap<String, String>();
 			JsonArray headersArray = obj.get("headers").getAsJsonArray();
+			log.info("Processing headers, count: " + headersArray.size());
 			for(int i = 0; i < headersArray.size(); i++) {
 				JsonObject pair = headersArray.get(i).getAsJsonObject();
 				headers.put(pair.get("name").getAsString(), pair.get("value").getAsString());
 			}
 
+			log.info("Passing content.");
 			ProxyRequestFilterSingleton.getInstance().passContent(id, content, headers);
 		
 			out.println(gson.toJson(new ContentStoreResponse()));
+			log.info("Done");
 		}
 		catch(Exception e) {
+			log.error("Error while comitting task", e);
 			out.println(gson.toJson(new ExceptionTask(e)));
 		}
 		finally {			
