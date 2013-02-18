@@ -77,9 +77,13 @@ public class ProxyServlet extends HttpServlet {
 			resp.getOutputStream().close();
 		}
 		else if("main".equals(req.getParameter("action"))) {
-			startProxy();
+			String[] args = new String[] {
+				getServletContext().getInitParameter("proxy.listen.port"),
+				getServletContext().getInitParameter("proxy.listen.address")
+			};
+			Proxy.main(args);
 			
-			resp.getOutputStream().println("Main - proxy started");
+			resp.getOutputStream().println("Main - proxy started: " + args[1] + ":" + args[0]);
 			resp.getOutputStream().close();
 		}
 	}

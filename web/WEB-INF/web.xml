@@ -21,4 +21,18 @@
     </servlet-mapping>
 	 
 	 -->
+	 
+	 <context-param>
+		 <param-name>proxy.listen.address</param-name>
+		 <param-value>0.0.0.0</param-value>
+		 <!--
+			 Address on which proxy listens:
+				127.0.0.1 - Listens only for local connections
+				0.0.0.0	- Listen for all connections
+		 -->
+	 </context-param>
+	 <context-param>
+		 <param-name>proxy.listen.port</param-name>
+		 <param-value>8888</param-value>
+	 </context-param>
 </web-app>
