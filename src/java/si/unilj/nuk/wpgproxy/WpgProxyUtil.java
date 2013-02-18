@@ -24,6 +24,15 @@ public class WpgProxyUtil {
 		if(task.getHeaders().size() > 0) {
 			for(Map.Entry<String, String> p : task.getHeaders().entrySet()) {
 				String key = p.getKey();
+				
+				// content-encoding:
+				// proxy sends content as plain text, thus any content (different as gzip)
+				// encoding is undesirable
+				// content-length:
+				// this header bear the information about plain html from which is
+				// base but not the only source for DOM construction and thus
+				// serialization back would definitely generate string longer(rarely shorter)
+				// than string length noted in this flag
 				if(key.toLowerCase().equals("content-encoding") ||
 					key.toLowerCase().equals("content-length")) {
 					key = "X-ProxyRemove-" + key;
@@ -31,6 +40,14 @@ public class WpgProxyUtil {
 
 				response.addHeader(key, p.getValue());
 			}
+			
+			// proxy also returns content as chunked. If header is not set content length
+			// is in first line
+			if(!task.getHeaders().containsKey("Transfer-Encoding")) {
+				response.addHeader("Transfer-Encoding", "chunked");
+			}
+			
+			
 		}
 		else {
 			response.addHeader("Content-Type", "text/html");
