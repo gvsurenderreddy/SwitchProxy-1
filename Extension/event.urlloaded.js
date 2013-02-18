@@ -7,7 +7,7 @@
   * Pass serialized DOM to extension, which then send content to Proxy server
   */
 var BrowserHarvester = {
-	ClientScript : {
+	ContentScript : {
 		serializeDOM : function() {
 			var roots = document.childNodes;
 			var buffer = "";
@@ -31,28 +31,51 @@ var BrowserHarvester = {
 
 			return buffer;
 		},
+
+		log : function(message) {
+			chrome.extension.sendMessage({
+				type 	: 'log',
+				message	: message
+			});
+		},
+
 		commit : function(options) {
-//			var content = document.getElementsByTagName('html')[0].innerHTML;
-			var data = {
-				url : location.href,
-				content : BrowserHarvester.ClientScript.serializeDOM(),
-				headers : [],
-				metadata : {}
-			}
+			try {
+				BrowserHarvester.ContentScript.log("Starting commit..");
 
-			if(options != null) {
-				// Post process Serialized DOM
-				if( (typeof options.processHTML === 'function') ) {
-					data.content = options.processHTML(data.content);
+				BrowserHarvester.ContentScript.log("Packing(DOM serialization)..");
+				var data = {
+					type 		: 'commit',
+					url 		: location.href,
+					content		: BrowserHarvester.ContentScript.serializeDOM(),
+					headers		: [],
+					metadata	: {}
 				}
-				// todo metadata
-				if(options.metadata != null) {
-					//append
-					data.metadata = options.metadata;
-				}
-			}
 
-			chrome.extension.sendMessage(data);			
+				if(options != null) {
+					// Post process Serialized DOM
+					if( (typeof options.processHTML === 'function') ) {
+						BrowserHarvester.ContentScript.log("Executin serialization Post-process function..");
+						data.content = options.processHTML(data.content);
+					}
+					// todo metadata
+					if(options.metadata != null) {
+						BrowserHarvester.ContentScript.log("Appending meta data.");
+						//append
+						data.metadata = options.metadata;
+					}
+				}
+
+				BrowserHarvester.ContentScript.log("Sending message..");
+
+				chrome.extension.sendMessage(data);
+			}
+			catch(e) {
+				chrome.extension.sendMessage({
+					type 		: 'exception',
+					exception	: e.toString()
+				});
+			}
 		}
 	}
 };
