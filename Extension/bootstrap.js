@@ -1,13 +1,13 @@
 var BrowserHarvester = {
 	Config: {
-		URL_GET : 'http://localhost:8080/SwitchProxy/renderer-interface',
-		URL_STORE : 'http://localhost:8080/SwitchProxy/renderer-interface'
+		URL_GET : 'http://localhost:9080/SwitchProxy/renderer-interface',
+		URL_STORE : 'http://localhost:9080/SwitchProxy/renderer-interface'
 	},
 
 	// -----------------------------------------------------------------------------------------
 	Log:  {
 		debug: function(message, obj) {
-			BrowserHarvester.log(message, obj);
+//			BrowserHarvester.log(message, obj);
 		},
 		info: function(message, obj) {
 			BrowserHarvester.log(message, obj);
@@ -78,11 +78,13 @@ var BrowserHarvester = {
 		// Poll implementation
 		// Spawns request to fetch rendering task form  server		
 		poll : function() {
+			BrowserHarvester.Log.info("Listening for new task..");				
+
 			$.ajax({
 				url : BrowserHarvester.Config.URL_GET,
 				contentType: 'application/json; charset=utf-8',
 				success : function(task) {
-					BrowserHarvester.log("Poll task", task);
+					BrowserHarvester.Log.debug("Poll task", task);
 
 					if(task.valid) {
 						BrowserHarvester.log("New task(ID: " + task.id +
@@ -126,13 +128,14 @@ var BrowserHarvester = {
 	Responses: [],
 
 	start : function() {
-		BrowserHarvester.log("Browser renderer started");
+		BrowserHarvester.Log.info("BrowserHarvester initializing...");
 
 		// Listens to messages from content-script: event.urlloaded.js
 		// Listens to messages from content script, which extracts and passes serialized DOM		
 		chrome.extension.onMessage.addListener(function(data, sender, sendResponse) {
 			BrowserHarvester.Service.commit(data);
 		});
+		BrowserHarvester.Log.info("Registered onMessage(content-script messaging) listener.");
 
 		// Register DOM ready listener
 		// Here is our point to inject scripts to build desired pages for archive
@@ -152,10 +155,12 @@ var BrowserHarvester = {
 		        });
 		    }
 		});
+		BrowserHarvester.Log.info("Registered onUpdated(Dom events) listener.");
 
 		chrome.webRequest.onHeadersReceived.addListener(function(response) {
 			BrowserHarvester.Responses.push(response);			
 		}, {urls:["<all_urls>"]}, ["responseHeaders"]);
+		BrowserHarvester.Log.info("Registered onHeadersReceived(Spying for reponse headers) listener.");		
 
 		BrowserHarvester.Service.poll();
 	},
