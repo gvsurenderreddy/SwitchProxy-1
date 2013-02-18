@@ -101,7 +101,7 @@ var BrowserHarvester = {
 
 					if(task.valid) {
 						BrowserHarvester.Log.info("New task fetched(ID: " + task.id +
-							"; script-lenght: " + task.rule.clientScript +
+							"; script-lenght: " + task.rule.clientScript.length +
 							") acquired for url: " + task.url);
 						// task is valid
 						// store script which would be executed when page is fully rendered
@@ -150,7 +150,7 @@ var BrowserHarvester = {
 					BrowserHarvester.Service.commit(data);
 					break;
 				case 'exception':
-					BrowserHarvester.Log.error("Content-script exception:", data.exception);
+					BrowserHarvester.Log.error("Content-script exception >> ", data.exception);
 					// TODO reset
 					break;
 				case 'log':
@@ -166,12 +166,18 @@ var BrowserHarvester = {
 		chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 			// Execute some script when the page is fully (DOM) ready
 		    if (changeInfo.status == 'complete') {
+		    	if(	BrowserHarvester.CurrentRenderingTab == null ||
+		    		tab.id != BrowserHarvester.CurrentRenderingTab.id) {
+		    		BrowserHarvester.Log.warn("Invalid scope(tab): " + tab.url);
+		    		return;
+		    	}
+
 		    	// No need for annother recursive injection
 		    	if(BrowserHarvester.CurrentTaskScriptInjected)	return;
 		    	BrowserHarvester.CurrentTaskScriptInjected = true;
 
 		    	BrowserHarvester.Log.info("DOM ready, injecting script.");
-		    	BrowserHarvester.Log.info(BrowserHarvester.CurrentTaskScript);
+		    	BrowserHarvester.Log.info("Script:" + BrowserHarvester.CurrentTaskScript);
 
 		        chrome.tabs.executeScript(null, {
 		        	code:BrowserHarvester.CurrentTaskScript
