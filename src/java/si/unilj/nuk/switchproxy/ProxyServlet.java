@@ -79,7 +79,8 @@ public class ProxyServlet extends HttpServlet {
 		else if("main".equals(req.getParameter("action"))) {
 			String[] args = new String[] {
 				getServletContext().getInitParameter("proxy.listen.port"),
-				getServletContext().getInitParameter("proxy.listen.address")
+				getServletContext().getInitParameter("proxy.listen.address"),
+				req.getServletContext().getRealPath("WEB-INF/exproxy-keystore")
 			};
 			Proxy.main(args);
 			

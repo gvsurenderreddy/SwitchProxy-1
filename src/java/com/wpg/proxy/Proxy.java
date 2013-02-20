@@ -183,8 +183,10 @@ public class Proxy extends Thread {
     public static void main(String[] args) {
 		 String address = "0.0.0.0";
 		 int port = 8888;
+		 String keystore = "";
 		 try { address = args[1]; } catch(Exception e) {}
 		 try { port = Integer.parseInt(args[0]); } catch(Exception e) {}
+		 try { keystore = args[2]; } catch(Exception e) {}
 		 
         Properties props = new Properties();
         props.setProperty("log4j.rootLogger","DEBUG, stdout");
@@ -200,7 +202,7 @@ public class Proxy extends Thread {
             try {
                 keyFile = File.createTempFile("proxy","keystore");
                 keyFile.deleteOnExit();
-                DataInputStream keyIS = new DataInputStream(logger.getClass().getResourceAsStream("/com/wpg/exproxy-keystore") );
+                DataInputStream keyIS = new DataInputStream(new FileInputStream(keystore) );
                 FileOutputStream fo = new FileOutputStream( keyFile );
                 byte[] b = new byte[1];
                 while( keyIS.read(b,0,1) != -1 )
