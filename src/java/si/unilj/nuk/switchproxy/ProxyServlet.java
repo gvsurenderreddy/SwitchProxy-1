@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.wpg.proxy.Proxy;
 import javax.servlet.annotation.WebServlet;
+import net.sourceforge.jhttpp2.Jhttpp2Launcher;
+import net.sourceforge.jhttpp2.Jhttpp2Server;
 import si.unilj.nuk.wpgproxy.ProxySingleton;
 
 /**
@@ -85,6 +87,12 @@ public class ProxyServlet extends HttpServlet {
 			Proxy.main(args);
 			
 			resp.getOutputStream().println("Main - proxy started: " + args[1] + ":" + args[0]);
+			resp.getOutputStream().close();
+		}
+		else if("main-jhttpp2".equals(req.getParameter("action"))) {
+			Jhttpp2Launcher.main(new String[0]);
+			
+			resp.getOutputStream().println("Main - proxy started: ");
 			resp.getOutputStream().close();
 		}
 	}
