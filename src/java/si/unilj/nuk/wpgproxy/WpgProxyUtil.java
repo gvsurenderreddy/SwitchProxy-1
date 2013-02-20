@@ -54,6 +54,9 @@ public class WpgProxyUtil {
 			response.addHeader("Transfer-Encoding", "chunked");		
 		}
 		
+		// new content length
+		response.addHeader("Content-Length", String.valueOf(task.getContent().getBytes().length));
+		
 		return response;
 	}
 }
