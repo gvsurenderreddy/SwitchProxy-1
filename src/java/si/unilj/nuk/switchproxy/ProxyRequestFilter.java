@@ -100,11 +100,11 @@ public class ProxyRequestFilter {
 	// -- Renderer interface ----------------------------------------------------
 	
 	public RenderTask nextTask() {
-		log.debug("Client asks for new task.");
+//		log.debug("Client asks for new task.");
 		
 		RenderTask task = taskQueue.poll();
 		if(task != null) {
-			log.debug("New task poped.");
+			log.info("New task retrived from list: " + task);
 			
 			activeTasks.put(task.getId(), task);
 		}
