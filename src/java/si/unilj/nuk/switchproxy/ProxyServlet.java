@@ -90,7 +90,20 @@ public class ProxyServlet extends HttpServlet {
 			resp.getOutputStream().close();
 		}
 		else if("main-jhttpp2".equals(req.getParameter("action"))) {
-			Jhttpp2Launcher.main(new String[0]);
+				Jhttpp2Server	server = new Jhttpp2Server();
+				server.SERVER_PROPERTIES_FILE = req.getServletContext().getRealPath("WEB-INF/jhttpp2/server.properties");
+				server.DATA_FILE = req.getServletContext().getRealPath("WEB-INF/jhttpp2/server.data");
+				server.MAIN_LOGFILE = req.getServletContext().getRealPath("WEB-INF/jhttpp2/server.log");
+				server.log_access_filename = req.getServletContext().getRealPath("WEB-INF/jhttpp2/access.log");
+				server.init();
+				
+				if (server.fatalError) {
+					System.out.println("Error: " +  server.getErrorMessage());
+				}
+				else {
+					new Thread(server).start();
+						System.out.println("Running on port " + server.port);
+				}
 			
 			resp.getOutputStream().println("Main - proxy started: ");
 			resp.getOutputStream().close();

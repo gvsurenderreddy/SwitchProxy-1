@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -29,9 +30,9 @@ public class Jhttpp2Server implements Runnable {
 	private final String VERSION = "0.4.80b1";
 	private final String HTTP_VERSION = "HTTP/1.1";
 
-	private final String MAIN_LOGFILE = "server.log";
-	private final String DATA_FILE = "server.data";
-	private final String SERVER_PROPERTIES_FILE = "server.properties";
+	public String MAIN_LOGFILE = "server.log";
+	public String DATA_FILE = "server.data";
+	public String SERVER_PROPERTIES_FILE = "server.properties";
 
 	private String httpUserAgent = "Mozilla/4.0 (compatible; MSIE 5.0; WindowsNT 5.1)";
 	private ServerSocket listen;
@@ -72,10 +73,11 @@ public class Jhttpp2Server implements Runnable {
 	public boolean webconfig = false;
 	public boolean www_server = true;
 
-	void init() {
+	public void init() {
 		// create new BufferedWriter instance for logging to file
 		try {
-			logFile = new BufferedWriter(new FileWriter(MAIN_LOGFILE, true));
+//			logFile = new BufferedWriter(new FileWriter(MAIN_LOGFILE, true));
+			logFile = new BufferedWriter(new OutputStreamWriter(System.out));
 		} catch (Exception e_logfile) {
 			setErrorMsg("Unable to open the main log file.");
 			if (logFile == null)
@@ -108,7 +110,6 @@ public class Jhttpp2Server implements Runnable {
 	}
 
 	public Jhttpp2Server() {
-		init();
 	}
 
 	public Jhttpp2Server(boolean b) {
@@ -307,8 +308,10 @@ public class Jhttpp2Server implements Runnable {
 				.intValue();
 		log_access = new Boolean(serverproperties.getProperty(
 				"server.access.log", "true")).booleanValue();
+		if(false) {
 		log_access_filename = serverproperties.getProperty(
 				"server.access.log.filename", "access.log");
+		}
 		webconfig = new Boolean(serverproperties.getProperty(
 				"server.webconfig", "false")).booleanValue();
 		www_server = new Boolean(serverproperties.getProperty("server.www",
