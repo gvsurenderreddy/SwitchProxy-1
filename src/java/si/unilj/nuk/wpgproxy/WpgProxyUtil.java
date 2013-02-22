@@ -34,6 +34,7 @@ public class WpgProxyUtil {
 				// serialization back would definitely generate string longer(rarely shorter)
 				// than string length noted in this flag
 				if(key.toLowerCase().equals("content-encoding") ||
+					key.toLowerCase().equals("transfer-encoding") ||
 					key.toLowerCase().equals("content-length")) {
 					key = "X-ProxyRemove-" + key;
 				}
@@ -43,7 +44,7 @@ public class WpgProxyUtil {
 			
 			// proxy also returns content as chunked. If header is not set content length
 			// is in first line
-			if(!task.getHeaders().containsKey("Transfer-Encoding")) {
+			if(!task.getHeaders().containsKey("Transfer-Encoding") && false) {
 				response.addHeader("Transfer-Encoding", "chunked");
 			}
 			
@@ -51,7 +52,7 @@ public class WpgProxyUtil {
 		}
 		else {
 			response.addHeader("Content-Type", "text/html");
-			response.addHeader("Transfer-Encoding", "chunked");		
+//			response.addHeader("Transfer-Encoding", "chunked");		
 		}
 		
 		// new content length
