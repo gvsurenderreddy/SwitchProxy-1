@@ -134,6 +134,10 @@
 				height:auto;
 				overflow: hidden;
 			}
+			th {
+				background: #898989;
+				color:white;
+			}
 			
 		</style>
 		<title>JSP Page</title>
