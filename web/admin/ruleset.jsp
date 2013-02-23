@@ -68,6 +68,24 @@
 		clientScript = umr.getClientScript();
 		urlPattern = umr.getUrlPattern().toString();
 	}
+	else if("move-up".equals(request.getParameter("action"))) {
+		currentIndex = Integer.parseInt(request.getParameter("index"));
+		
+		UrlMatchRule r1 = ruleSet.get(currentIndex);
+		UrlMatchRule r2 = ruleSet.get(currentIndex - 1);
+		
+		ruleSet.set(currentIndex - 1, r1);
+		ruleSet.set(currentIndex, r2);
+	}
+	else if("move-down".equals(request.getParameter("action"))) {
+		currentIndex = Integer.parseInt(request.getParameter("index"));
+		
+		UrlMatchRule r1 = ruleSet.get(currentIndex);
+		UrlMatchRule r2 = ruleSet.get(currentIndex + 1);
+		
+		ruleSet.set(currentIndex + 1, r1);
+		ruleSet.set(currentIndex, r2);
+	}
 
 %>
 <!DOCTYPE html>
@@ -138,6 +156,16 @@
 						%>
 						<tr>
 							<td>
+								<%
+						
+									if(idx > 0) {
+										%><a href="?action=move-up&index=<%=idx%>">Up</a><%
+									}
+									if(idx < ruleSet.size() - 1) {
+										%><a href="?action=move-down&index=<%=idx%>">Down</a><%
+									}
+						
+								%>								
 								<a href="?action=remove&index=<%=idx%>">Remove</a>
 								<a href="?action=edit&index=<%=idx%>#form">Edit</a>
 							</td>
