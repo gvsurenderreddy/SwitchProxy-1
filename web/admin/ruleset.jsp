@@ -96,9 +96,32 @@
 				}
 			 });
 		</script>
+		<style>
+			.script {
+				padding:0 !important;
+			}
+			.script pre {
+				margin:0 !important;
+				padding:10px;
+				height:20px;
+				overflow: hidden;
+				border-left: 5px solid white;
+				cursor: pointer;
+			}
+			.script pre:hover {
+				border-left: 5px solid blue;
+			}
+			.script pre:focus {
+				border-left: 5px solid red;
+				height:auto;
+				overflow: hidden;
+			}
+			
+		</style>
 		<title>JSP Page</title>
 	</head>
 	<body>
+		<h2>Ruleset</h2>
 		<table border="1" cellspacing="0" width="100%">
 			<thead>
 				<tr>
@@ -119,7 +142,7 @@
 								<a href="?action=edit&index=<%=idx%>#form">Edit</a>
 							</td>
 							<td><%=r.getUrlPattern().toString() %></td>
-							<td><pre><%=r.getClientScript() %></pre></td>
+							<td class="script"><pre tabindex="<%=idx%>"><%=r.getClientScript() %></pre></td>
 						</tr>						
 						<%
 						
@@ -130,6 +153,7 @@
 			</tbody>
 		</table>
 		<hr>
+		<h2>Rule editor</h2>
 		<a name="form"></a>
 		<form action="?action=set" method="post">
 			<input name="index" type="hidden" value="<%= currentIndex %>">
@@ -139,6 +163,7 @@
 			<input type="submit">
 		</form>
 		<hr>
+		<h2>Persistence</h2>
 		Xml file:  <b><%= pageContext.getServletContext().getRealPath("WEB-INF/ruleset.xml") %></b> |
 		<button onclick="location.href='?action=store'">Save</button>
 		<button onclick="location.href='?action=load'">Load</button>
