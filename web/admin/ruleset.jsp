@@ -21,9 +21,18 @@
 	
 	String urlPattern = "";
 	String clientScript = "";
+	int currentIndex = -1;
 
-	if("add".equals(request.getParameter("action"))) {
-		ruleSet.add(new UrlMatchRule(request.getParameter("urlpattern"), request.getParameter("script")));
+	if("set".equals(request.getParameter("action"))) {
+		try { currentIndex = Integer.parseInt(request.getParameter("index")); }
+		catch(NumberFormatException e) {}
+		
+		if(currentIndex < 0) {
+			ruleSet.add(new UrlMatchRule(request.getParameter("urlpattern"), request.getParameter("script")));
+		}
+		else {
+			ruleSet.set(currentIndex, new UrlMatchRule(request.getParameter("urlpattern"), request.getParameter("script")));
+		}
 		
 		response.sendRedirect("ruleset.jsp");
 	}
@@ -53,9 +62,9 @@
 		}			
 	}
 	else if("edit".equals(request.getParameter("action"))) {
-		int index = Integer.parseInt(request.getParameter("index"));
+		currentIndex = Integer.parseInt(request.getParameter("index"));
 		
-		UrlMatchRule umr = ruleSet.get(index);
+		UrlMatchRule umr = ruleSet.get(currentIndex);
 		clientScript = umr.getClientScript();
 		urlPattern = umr.getUrlPattern().toString();
 	}
@@ -122,7 +131,8 @@
 		</table>
 		<hr>
 		<a name="form"></a>
-		<form action="?action=add" method="post">
+		<form action="?action=set" method="post">
+			<input name="index" type="hidden" value="<%= currentIndex %>">
 			Url pattern <input name="urlpattern" type="text" size="100" value="<%= urlPattern %>"><br>
 			Script:<br>
 			<textarea cols="100" rows="20" name="script"><%= clientScript %></textarea><br>
