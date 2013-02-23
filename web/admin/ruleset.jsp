@@ -51,10 +51,32 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<script type="text/javascript" src="../res/jquery-1.9.1.js"></script>
+		<script type="text/javascript">
+			// from: http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
+			$(document).delegate('textarea', 'keydown', function(e) {
+				var keyCode = e.keyCode || e.which;
+
+				if (keyCode == 9) {
+				  e.preventDefault();
+				  var start = $(this).get(0).selectionStart;
+				  var end = $(this).get(0).selectionEnd;
+
+				  // set textarea value to: text before caret + tab + text after caret
+				  $(this).val($(this).val().substring(0, start)
+								  + "\t"
+								  + $(this).val().substring(end));
+
+				  // put caret at right position again
+				  $(this).get(0).selectionStart =
+				  $(this).get(0).selectionEnd = start + 1;
+				}
+			 });
+		</script>
 		<title>JSP Page</title>
 	</head>
 	<body>
-		<table border="1" cellspacing="0">
+		<table border="1" cellspacing="0" width="100%">
 			<thead>
 				<tr>
 					<th></th>
@@ -81,9 +103,10 @@
 		</table>
 		<hr>
 		<form action="?action=add" method="post">
-			Url pattern <input name="urlpattern" type="text"><br>
+			Url pattern <input name="urlpattern" type="text" size="100"><br>
 			Script:<br>
-			<textarea cols="100" rows="10" name="script"></textarea><br>
+			<textarea cols="100" rows="20" name="script"
+						 onkeyup="console.log(event)"></textarea><br>
 			<input type="submit">
 		</form>
 		<hr>
