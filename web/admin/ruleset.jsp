@@ -18,12 +18,19 @@
 <%
 	
 	Vector<UrlMatchRule> ruleSet = ProxyRequestFilterSingleton.getInstance().getRuleSet();
+	
+	String urlPattern = "";
+	String clientScript = "";
 
 	if("add".equals(request.getParameter("action"))) {
 		ruleSet.add(new UrlMatchRule(request.getParameter("urlpattern"), request.getParameter("script")));
+		
+		response.sendRedirect("ruleset.jsp");
 	}
 	else if("remove".equals(request.getParameter("action"))) {
 		ruleSet.remove(Integer.parseInt(request.getParameter("index")));
+		
+		response.sendRedirect("ruleset.jsp");
 	}
 	else if("store".equals(request.getParameter("action"))) {
 		try {
@@ -44,6 +51,13 @@
 			throw e;
 //			response.getWriter().print(e.toString());
 		}			
+	}
+	else if("edit".equals(request.getParameter("action"))) {
+		int index = Integer.parseInt(request.getParameter("index"));
+		
+		UrlMatchRule umr = ruleSet.get(index);
+		clientScript = umr.getClientScript();
+		urlPattern = umr.getUrlPattern().toString();
 	}
 
 %>
@@ -91,22 +105,27 @@
 					for(UrlMatchRule r : ruleSet) {
 						%>
 						<tr>
-							<td><a href="?action=remove&index=<%=idx++%>">Remove</a></td>
+							<td>
+								<a href="?action=remove&index=<%=idx%>">Remove</a>
+								<a href="?action=edit&index=<%=idx%>#form">Edit</a>
+							</td>
 							<td><%=r.getUrlPattern().toString() %></td>
 							<td><pre><%=r.getClientScript() %></pre></td>
 						</tr>						
 						<%
+						
+						idx++;
 					}
 					
 				%>
 			</tbody>
 		</table>
 		<hr>
+		<a name="form"></a>
 		<form action="?action=add" method="post">
-			Url pattern <input name="urlpattern" type="text" size="100"><br>
+			Url pattern <input name="urlpattern" type="text" size="100" value="<%= urlPattern %>"><br>
 			Script:<br>
-			<textarea cols="100" rows="20" name="script"
-						 onkeyup="console.log(event)"></textarea><br>
+			<textarea cols="100" rows="20" name="script"><%= clientScript %></textarea><br>
 			<input type="submit">
 		</form>
 		<hr>
