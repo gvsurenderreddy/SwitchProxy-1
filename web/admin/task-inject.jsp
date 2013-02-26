@@ -14,17 +14,45 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>JSP Page</title>
+		<script type="text/javascript" src="../res/jquery-1.9.1.js"></script>
+		<script type="text/javascript">
+			// from: http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
+			$(document).delegate('textarea', 'keydown', function(e) {
+				var keyCode = e.keyCode || e.which;
+
+				if (keyCode == 9) {
+				  e.preventDefault();
+				  var start = $(this).get(0).selectionStart;
+				  var end = $(this).get(0).selectionEnd;
+
+				  // set textarea value to: text before caret + tab + text after caret
+				  $(this).val($(this).val().substring(0, start)
+								  + "\t"
+								  + $(this).val().substring(end));
+
+				  // put caret at right position again
+				  $(this).get(0).selectionStart =
+				  $(this).get(0).selectionEnd = start + 1;
+				}
+			 });
+		</script>		
 	</head>
 	<body>
 		<%
 		
+			String url = request.getParameter("url");
+			if(url == null) url = "";
+			String script = request.getParameter("script");
+			if(script == null) script = "";
+			
+			
 		if(request.getMethod().equals("POST")) {
 			ProxyRequestFilterSingleton.getInstance().getTaskQueue().add(
 				new RenderTask(
-					  request.getParameter("url"),
+					  url,
 					  new UrlMatchRule(
 							"injection",
-							request.getParameter("script"))));
+							script)));
 			
 			%>
 			Injected!
@@ -34,8 +62,9 @@
 		
 		%>
 		<form method="post">
-			url: <input type="text" name="url"><br>
-			script: <textarea name="script"></textarea><br>
+			url: <input type="text" name="url" size="100" value="<%= url %>"><br>
+			script:<br>
+			<textarea name="script" cols="100" rows="20"><%= script %></textarea><br>
 			<input type="submit">
 		</form>
 	</body>
