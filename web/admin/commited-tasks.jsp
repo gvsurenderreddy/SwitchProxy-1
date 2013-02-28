@@ -5,6 +5,17 @@
 <%@page import="java.util.Hashtable"%>
 <%@page import="si.unilj.nuk.switchproxy.ProxyRequestFilterSingleton"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+	
+	Vector<RenderTask> commitedTasks = ProxyRequestFilterSingleton.getInstance().getCommitedTasks();
+	
+	if("clear".equals(request.getParameter("action"))) {
+		commitedTasks.clear();
+		
+		response.sendRedirect("commited-tasks.jsp");
+	}
+	
+%>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -15,17 +26,15 @@
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">
 			<thead>
 				<tr>
+					<th></th>
 					<th witdh="200">UUID</th>
 					<th>URL</th>
 					<th>Content-length</th>
 					<th>Headers</th>
-					<th></th>
 				</tr>
 			</thead>
 			<tbody>
 				<%
-					
-					Vector<RenderTask> commitedTasks = ProxyRequestFilterSingleton.getInstance().getCommitedTasks();
 					
 					int index = 0;
 					for(RenderTask t : commitedTasks) {
@@ -36,11 +45,11 @@
 						
 						%>
 						<tr>
+							<td><a href="task-content.jsp?index=<%= index++ %>">Ogled vsebine</a></td>
 							<td><%= t.getId() %></td>
 							<td><%= t.getUrl() %></td>
 							<td><%= t.getContent().length() %></td>
 							<td><pre><%= buff.toString() %></pre></td>
-							<td><a href="task-content.jsp?index=<%= index++ %>">Ogled vsebine</a></td>
 						</tr>
 						<%
 					}
@@ -48,5 +57,7 @@
 				%>
 			</tbody>
 		</table>
+		<hr>
+		<button onclick="location.href='?action=clear'">Clear</button>
 	</body>
 </html>
