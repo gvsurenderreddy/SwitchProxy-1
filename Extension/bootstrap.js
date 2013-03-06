@@ -179,8 +179,10 @@ var BrowserHarvester = {
 		    	BrowserHarvester.Log.info("DOM ready, injecting script.");
 		    	BrowserHarvester.Log.info("Script:" + BrowserHarvester.CurrentTaskScript);
 
-		        chrome.tabs.executeScript(null, {
+		        chrome.tabs.executeScript(tabId, {
 		        	code:BrowserHarvester.CurrentTaskScript
+		        }, function(obj) {
+		        	BrowserHarvester.Log.info("Script executed.");
 		        });
 		    }
 		});
