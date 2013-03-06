@@ -2,8 +2,15 @@
 BrowserHarvester.Service =  {
 	/**
 	 * Commits operation to server
+	 * Structure data:
+	 * 	* content - html content from browser
+	 *	* headers - modified/added HTTP header
+	 *	* metadata - metadata
+	 }
 	 */
 	commit : function(data) {
+		BrowserHarvester.Monitor.stop();
+
 		BrowserHarvester.Log.info(
 			"Received commit request with data(html content length: " + data.content.length +
 			") from content script for URL: " + data.url);
@@ -62,6 +69,50 @@ BrowserHarvester.Service =  {
 
 	},
 
+	cancel : function(message) {
+		BrowserHarvester.Monitor.stop();
+
+		BrowserHarvester.Log.info("Canceling task due to " + message);
+
+		$.ajax({
+			url: BrowserHarvester.Config.URL_STORE,
+			type: 'post',
+			data : JSON.stringify({
+				"content"	: "canceled due: " + message,
+				"id"		: BrowserHarvester.CurrentTaskId,
+				"headers"	: [],
+				"metadata"	: {}
+			}),
+
+//				contentType : "application/x-www-form-urlencoded; charset=utf-8",
+			contentType : "application/json; charset=utf-8",
+			dataType: "json",
+
+			success : function(response) {
+				BrowserHarvester.Log.info("Request successfully canceled: ", response);
+
+				BrowserHarvester.Log.info("Tear down...");
+
+				// close tabl, cleanup
+				chrome.tabs.remove(BrowserHarvester.CurrentRenderingTab.id);
+
+				// Reset
+				BrowserHarvester.CurrentTaskScript = null;
+				BrowserHarvester.CurrentTaskId = null;
+				BrowserHarvester.CurrentTaskScriptInjected = false;
+				BrowserHarvester.CurrentRenderingTab = null;
+				BrowserHarvester.CurrentTaskUrl = null;
+				BrowserHarvester.Responses = [];
+
+				BrowserHarvester.Service.poll();
+			},
+			error: function(xhr, text, err) {
+				BrowserHarvester.Log.error("Error while passing content. Fix the problem and reload extension.", [xhr, text, err]);
+				// TODO reset
+			}
+		});
+	},
+
 	// Poll implementation
 	// Spawns request to fetch rendering task form  server		
 	poll : function() {
@@ -82,6 +133,8 @@ BrowserHarvester.Service =  {
 					BrowserHarvester.CurrentTaskScript = task.rule.clientScript;
 					BrowserHarvester.CurrentTaskId = task.id;
 					BrowserHarvester.CurrentTaskUrl = task.url;
+
+					BrowserHarvester.Monitor.start();
 
 					// open tab with url
 					var tabId = chrome.tabs.create({
@@ -109,6 +162,45 @@ BrowserHarvester.CurrentRenderingTab = null;
 BrowserHarvester.CurrentTaskScriptInjected= false;
 BrowserHarvester.CurrentTaskUrl = null;
 BrowserHarvester.Responses= [];
+
+BrowserHarvester.RetryCount = 0;
+BrowserHarvester.TimeoutMonitorId = null;
+
+BrowserHarvester.Monitor = {
+	start : function() {
+		var ms = BrowserHarvester.Config.PROCESSING_TIMEOUT;
+		BrowserHarvester.Log.info("Setting timeout for processing request: " + ms + " ms");
+
+		setTimeout(BrowserHarvester.Monitor.retry, ms);
+	},
+	retry : function() {
+		BrowserHarvester.Log.info("Retrying reqeust: " + (BrowserHarvester.RetryCount + 1) + " of " +
+			BrowserHarvester.Config.PROCESSING_TIMEOUT_RETRY);
+
+		if(BrowserHarvester.RetryCount++ < BrowserHarvester.Config.PROCESSING_TIMEOUT_RETRY) {
+			BrowserHarvester.Log.info("Reloading/Retrying..");
+
+			// reseting script injection state and reload tab
+			BrowserHarvester.CurrentTaskScriptInjected = false;
+			chrome.tabs.reload(BrowserHarvester.CurrentRenderingTab.id);
+
+			setTimeout(BrowserHarvester.Monitor.retry, BrowserHarvester.Config.PROCESSING_TIMEOUT);
+		}
+		else {
+			BrowserHarvester.Log.info("Cancelling..");
+			// cancel
+			BrowserHarvester.Service.cancel("Timeouts & retrying.");
+		}
+
+	},
+	stop : function() {
+		BrowserHarvester.Log.info("Clearing processing timeout.");
+
+		clearTimeout(BrowserHarvester.TimeoutMonitorId);
+		BrowserHarvester.RetryCount = 0;
+		BrowserHarvester.TimeoutMonitorId = null;
+	}
+};
 
 BrowserHarvester.start = function() {
 	BrowserHarvester.Log.Filesystem.init();
