@@ -25,5 +25,13 @@
 				Injects task for testing purposes.
 			</li>
 		</ul>
+		<h2>Proxy</h2>
+		<ul>
+			<li>
+				<a href="../proxy?action=main-jhttpp2">Start jHTTPp2</a><br>
+				Starts proxy
+			</li>
+		</ul>
+		
 	</body>
 </html>
