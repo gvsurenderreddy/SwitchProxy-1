@@ -7,6 +7,8 @@
 	"background" : {
 		"scripts" : [
 			"jquery-1.9.1.js",
+			"config.js",
+			"logger.js",
 			"bootstrap.js"
 		]
 	},
