@@ -20,7 +20,35 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>JSP Page</title>
+		<title>Commited tasks</title>
+		<style>
+			.headers {
+				padding:0 !important;
+			}
+			.headers pre {
+				margin:0 !important;
+				padding:10px;
+				height:20px;
+				overflow: hidden;
+				border-left: 5px solid white;
+				cursor: pointer;
+				max-width: 400px;
+			}
+			.headers pre:hover {
+				border-left: 5px solid blue;
+			}
+			.headers pre:focus {
+				border-left: 5px solid red;
+				height:auto;
+				overflow: hidden;
+				max-width: none;
+			}
+			th {
+				background: #898989;
+				color:white;
+			}
+			
+		</style>		
 	</head>
 	<body>
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">
@@ -49,7 +77,7 @@
 							<td><%= t.getId() %></td>
 							<td><%= t.getUrl() %></td>
 							<td><%= t.getContent().length() %></td>
-							<td><pre><%= buff.toString() %></pre></td>
+							<td class="headers"><pre tabindex="<%=index%>"><%= buff.toString() %></pre></td>
 						</tr>
 						<%
 					}
