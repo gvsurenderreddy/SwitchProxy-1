@@ -1,3 +1,6 @@
+<%@page import="java.util.Date"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.text.DateFormat"%>
 <%@page import="java.util.Vector"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.Map.Entry"%>
@@ -56,6 +59,9 @@
 				<tr>
 					<th></th>
 					<th witdh="200">UUID</th>
+					<th witdh="200">Created</th>
+					<th witdh="200">Commited</th>
+					<th witdh="200">ms</th>
 					<th>URL</th>
 					<th>Content-length</th>
 					<th>Headers</th>
@@ -63,6 +69,8 @@
 			</thead>
 			<tbody>
 				<%
+	
+					DateFormat dateFormat = new SimpleDateFormat("dd.MM H:m:s:S");
 					
 					int index = 0;
 					for(RenderTask t : commitedTasks) {
@@ -71,10 +79,16 @@
 							buff.append(p.getKey() + ": " + p.getValue() + "\n");
 						}
 						
+						Date created = t.getCreateDate();
+						Date commited = t.getCommitDate();
+						
 						%>
 						<tr>
 							<td><a href="task-content.jsp?index=<%= index++ %>">Ogled vsebine</a></td>
 							<td><%= t.getId() %></td>
+							<td><%= dateFormat.format(created) %></td>
+							<td><%= dateFormat.format(commited) %></td>
+							<td><%= commited.getTime() - created.getTime() %></td>
 							<td><%= t.getUrl() %></td>
 							<td><%= t.getContent().length() %></td>
 							<td class="headers"><pre tabindex="<%=index%>"><%= buff.toString() %></pre></td>

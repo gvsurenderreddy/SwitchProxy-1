@@ -4,6 +4,7 @@
  */
 package si.unilj.nuk.switchproxy;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -28,10 +29,15 @@ public class RenderTask {
 	
 	private String content = null;
 	private HashMap<String, String> headers = new HashMap<String, String>();
+	
+	private Date createDate;
+	private Date commitDate;
 
 	public RenderTask(String url, UrlMatchRule rule) {
 		this.url = url;
 		this.rule = rule;
+		
+		createDate = new Date();
 		
 		this.id = UUID.randomUUID().toString();
 	}
@@ -55,6 +61,7 @@ public class RenderTask {
 	public void setContent(String content) {
 		this.content = content;
 		this.complete = true;
+		commitDate = new Date();
 	}
 
 	public String getContent() {
@@ -71,6 +78,14 @@ public class RenderTask {
 	
 	public void addHeaderLine(String key, String value) {
 		headers.put(key, value);
+	}
+
+	public Date getCommitDate() {
+		return commitDate;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
 	}
 
 	@Override
