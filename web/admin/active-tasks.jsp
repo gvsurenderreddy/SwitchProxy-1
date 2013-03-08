@@ -22,7 +22,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>JSP Page</title>
+		<title>Active tasks</title>
 	</head>
 	<body>
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">

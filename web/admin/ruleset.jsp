@@ -140,7 +140,7 @@
 			}
 			
 		</style>
-		<title>JSP Page</title>
+		<title>Ruleset</title>
 	</head>
 	<body>
 		<h2>Ruleset</h2>
