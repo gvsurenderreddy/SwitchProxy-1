@@ -54,6 +54,9 @@
 		</style>		
 	</head>
 	<body>
+		Showing: <%= commitedTasks.size() %> of max <%= ProxyRequestFilterSingleton.getInstance().getCommitedTasksMaxSize() %>
+		<button onclick="location.href='?action=clear'">Clear</button>
+		<hr>
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">
 			<thead>
 				<tr>
@@ -99,7 +102,5 @@
 				%>
 			</tbody>
 		</table>
-		<hr>
-		<button onclick="location.href='?action=clear'">Clear</button>
 	</body>
 </html>

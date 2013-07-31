@@ -7,11 +7,11 @@
         </session-timeout>
     </session-config>
 		 
-    <servlet>
+    <!--servlet>
         <servlet-name>ProxyServlet</servlet-name>
         <servlet-class>si.unilj.nuk.switchproxy.ProxyServlet</servlet-class>
 		  <load-on-startup>1</load-on-startup>
-    </servlet>
+    </servlet-->
 	 
 	 
 	 <!--
@@ -35,4 +35,11 @@
 		 <param-name>proxy.listen.port</param-name>
 		 <param-value>8888</param-value>
 	 </context-param>
+	 
+	 <!-- Task history size. -->
+	 
+	 <context-param>
+		 <param-name>filter.commitedTasks.maxSize</param-name>
+		 <param-value>2</param-value>
+	 </context-param>	 
 </web-app>

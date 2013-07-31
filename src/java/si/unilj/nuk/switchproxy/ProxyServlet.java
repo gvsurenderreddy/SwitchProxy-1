@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.wpg.proxy.Proxy;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebServlet;
 import net.sourceforge.jhttpp2.Jhttpp2Launcher;
 import net.sourceforge.jhttpp2.Jhttpp2Server;
@@ -20,7 +22,7 @@ import si.unilj.nuk.wpgproxy.ProxySingleton;
  *
  * @author mitja
  */
-@WebServlet(name = "ProxyServlet", urlPatterns = {"/proxy"})
+@WebServlet(name = "ProxyServlet", urlPatterns = {"/proxy"}, loadOnStartup = 1)
 public class ProxyServlet extends HttpServlet {
 
 	@Override
@@ -28,6 +30,13 @@ public class ProxyServlet extends HttpServlet {
 		super.init(); //To change body of generated methods, choose Tools | Templates.
 //		ProxySingleton.getInstance().start();
 		
+		System.out.println("Proxy initializing..");
+		
+		ProxyRequestFilter filter = ProxyRequestFilterSingleton.getInstance();
+		try {
+			filter.setCommitedTasksMaxSize(Integer.parseInt(getServletContext().getInitParameter("filter.commitedTasks.maxSize")));
+		}
+		catch(NumberFormatException e) {}
 //		startProxy();
 	}
 
@@ -109,7 +118,7 @@ public class ProxyServlet extends HttpServlet {
 			resp.getOutputStream().close();
 		}
 	}
-	
-	
+
+
 	
 }

@@ -23,7 +23,24 @@ public class ProxyRequestFilter {
 	private Queue<RenderTask> taskQueue = new ConcurrentLinkedQueue<RenderTask>();
 	private Hashtable<String, RenderTask> activeTasks = new Hashtable<String, RenderTask>();
 	
+	/**
+	 * Task history.
+	 */
 	private Vector<RenderTask> commitedTasks = new Vector<RenderTask>();
+	/**
+	 * How many elements history should hold.
+	 */
+	private int commitedTasksMaxSize = 1000;
+	
+	public void setCommitedTasksMaxSize(int size) {
+		if(size < 1) {
+			throw new IllegalArgumentException("Max size must be between 1 and Integer.MAX_VALUE");
+		}
+		commitedTasksMaxSize = size;
+	}
+	public int getCommitedTasksMaxSize() {
+		return commitedTasksMaxSize;
+	}
 
 	public Vector<UrlMatchRule> getRuleSet() {
 		return ruleSet;
@@ -124,6 +141,11 @@ public class ProxyRequestFilter {
 			RenderTask task = activeTasks.get(id);
 			task.setHeaders(headers);
 			task.setContent(content);
+			
+			// enforcing history max(last n elements) size
+			if(commitedTasks.size() >= commitedTasksMaxSize) {
+				commitedTasks.remove(0);
+			}
 			
 			commitedTasks.add(task);
 		}
