@@ -20,9 +20,15 @@
 				<a href="ruleset.jsp">Ruleset</a><br>
 				Rules for dispatcher.
 			</li>
-			<li>
-				<a href="task-inject.jsp">Task inject</a><br>
-				Injects task for testing purposes.
+			<li style="margin-top:20px">
+				Testing(processing workflow)<br>
+				<br>
+				<ol>
+					<li><a href="task-inject.jsp">Task inject</a>: Injects task into queue;</li>
+					<li><a href="task-queue.jsp">Task queue</a>: Holds list of queued task waiting for renderer to fetch;</li>
+					<li><a href="active-tasks.jsp">Active tasks</a>: After browser fetched task, its copy is stored in this list where it can be canceled;</li>
+					<li><a href="commited-tasks.jsp">Commited tasks</a>: Task completed or canceled are moved to this list.</li>
+				</ol>			
 			</li>
 		</ul>
 		<h2>Proxy</h2>
