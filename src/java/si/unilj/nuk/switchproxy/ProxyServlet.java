@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.wpg.proxy.Proxy;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebServlet;
@@ -37,6 +38,10 @@ public class ProxyServlet extends HttpServlet {
 			filter.setCommitedTasksMaxSize(Integer.parseInt(getServletContext().getInitParameter("filter.commitedTasks.maxSize")));
 		}
 		catch(NumberFormatException e) {}
+		
+		loadRuleset(getServletContext());
+		
+		startJhttpp2Proxy(getServletContext());
 //		startProxy();
 	}
 
@@ -47,10 +52,34 @@ public class ProxyServlet extends HttpServlet {
 ////		ProxySingleton.getInstance().stop();
 //	}
 	
-	
-	
 	protected void startProxy() {
 		Proxy.main(new String[0]);
+	}
+	
+	protected void startJhttpp2Proxy(ServletContext ctx) {
+		Jhttpp2Server	server = new Jhttpp2Server();
+		server.SERVER_PROPERTIES_FILE = ctx.getRealPath("WEB-INF/jhttpp2/server.properties");
+		server.DATA_FILE = ctx.getRealPath("WEB-INF/jhttpp2/server.data");
+		server.MAIN_LOGFILE = ctx.getRealPath("WEB-INF/jhttpp2/server.log");
+		server.log_access_filename = ctx.getRealPath("WEB-INF/jhttpp2/access.log");
+		server.init();
+
+		if (server.fatalError) {
+			System.out.println("Error: " +  server.getErrorMessage());
+		}
+		else {
+			new Thread(server).start();
+				System.out.println("Running on port " + server.port);
+		}
+	}
+	
+	protected void loadRuleset(ServletContext ctx) {
+		try {
+			RulesetLoader.LoadFromXml(ProxyRequestFilterSingleton.getInstance().getRuleSet(), ctx);
+		}
+		catch(Exception e) {
+			System.out.println("Error loading ruleset: " + e.getLocalizedMessage());
+		}			
 	}
 
 	@Override
@@ -99,23 +128,10 @@ public class ProxyServlet extends HttpServlet {
 			resp.getOutputStream().close();
 		}
 		else if("main-jhttpp2".equals(req.getParameter("action"))) {
-				Jhttpp2Server	server = new Jhttpp2Server();
-				server.SERVER_PROPERTIES_FILE = req.getServletContext().getRealPath("WEB-INF/jhttpp2/server.properties");
-				server.DATA_FILE = req.getServletContext().getRealPath("WEB-INF/jhttpp2/server.data");
-				server.MAIN_LOGFILE = req.getServletContext().getRealPath("WEB-INF/jhttpp2/server.log");
-				server.log_access_filename = req.getServletContext().getRealPath("WEB-INF/jhttpp2/access.log");
-				server.init();
-				
-				if (server.fatalError) {
-					System.out.println("Error: " +  server.getErrorMessage());
-				}
-				else {
-					new Thread(server).start();
-						System.out.println("Running on port " + server.port);
-				}
+			startJhttpp2Proxy(getServletContext());
 			
 			resp.getOutputStream().println("Main - proxy started: ");
-			resp.getOutputStream().close();
+			resp.getOutputStream().close();			
 		}
 	}
 

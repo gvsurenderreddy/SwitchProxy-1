@@ -12,7 +12,12 @@
 		headers.put("Content-Type", "text/html");
 		headers.put("Transfer-Encoding", "chunked");
 		
-		ProxyRequestFilterSingleton.getInstance().passContent(request.getParameter("uuid"), "Canceled!!", headers);
+		String taskId = request.getParameter("uuid");
+		
+		ProxyRequestFilterSingleton.getInstance().passContent(taskId, "Canceled!!", headers);
+		
+		// Actor(crawler) which adds task normally removes task
+		ProxyRequestFilterSingleton.getInstance().getActiveTasks().remove(taskId);
 		
 		response.sendRedirect("active-tasks.jsp");
 	}

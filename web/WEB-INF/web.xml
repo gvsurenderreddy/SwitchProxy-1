@@ -40,6 +40,6 @@
 	 
 	 <context-param>
 		 <param-name>filter.commitedTasks.maxSize</param-name>
-		 <param-value>2</param-value>
+		 <param-value>1000</param-value>
 	 </context-param>	 
 </web-app>
