@@ -68,7 +68,7 @@ public class RendererInterfaceServlet extends HttpServlet {
 			  throws ServletException, IOException {
 		log.debug("Task poll");
 		
-		response.setContentType("text/json;charset=UTF-8");
+		response.setContentType("application/json;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		try {
 			Object o = ProxyRequestFilterSingleton.getInstance().nextTask();
