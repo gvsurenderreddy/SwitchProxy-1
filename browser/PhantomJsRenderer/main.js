@@ -1,5 +1,6 @@
 var Page = require('webpage');
 var system = require('system');
+
 require('./date.js');
 
 var PhantomRenderer = {
@@ -41,6 +42,8 @@ var PhantomRenderer = {
 			p.open(PhantomRenderer.Config.URL_GET, function(status) {
 				var task = JSON.parse(p.plainText);
 
+				p.close();
+
 				if(task.valid) {
 					PhantomRenderer.Log.i("New task: " + task.id + "; URL: " + task.url);
 
@@ -67,10 +70,12 @@ var PhantomRenderer = {
 			}), function(status) {
 				PhantomRenderer.Log.i("Content stored: " + status);
 
+				req.close();
+
 				PhantomRenderer.Task.current = null;
 				PhantomRenderer.Task.headers = [];
 
-				PhantomRenderer.Log.i("Listening for new task");
+				PhantomRenderer.Log.i("Listening for new task..");
 				PhantomRenderer.Net.next();
 			});
 		}
@@ -79,6 +84,9 @@ var PhantomRenderer = {
 	Renderer : {
 		callbackListener : function(data) {
 			switch(data.type) {
+				case 'api-log':
+					PhantomRenderer.Log.i(data.content);
+					break;				
 				case 'log':
 					PhantomRenderer.Log.i("FROM PAGE: " + data.content);
 					break;
@@ -136,6 +144,9 @@ var PhantomRenderer = {
 				PhantomRenderer.Log.i("Page loaded with status " + status);
 
 				if(status === 'success') {
+					PhantomRenderer.Log.i('Injecting API..');
+					page.injectJs('./pageapi.js');
+
 					PhantomRenderer.Log.i("Running task script..");
 					page.evaluateJavaScript(task.rule.clientScript);
 				}
