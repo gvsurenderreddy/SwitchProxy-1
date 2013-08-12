@@ -10,12 +10,18 @@ var PhantomRenderer = {
 
 	Log : {
 		i : function(msg) {
-			console.log(msg);
+			console.log("INFO:" + msg);
+		},
+		d : function(msg) {
+			console.log("DEBUG:" + msg);
 		}
 	},
 
 	Task : {
-		current : null
+		current : null,
+		headers : [],
+		page : null,
+		url : null
 	},
 
 	Net : {
@@ -52,6 +58,8 @@ var PhantomRenderer = {
 				PhantomRenderer.Log.i("Content stored: " + status);
 
 				PhantomRenderer.Task.current = null;
+				PhantomRenderer.Task.headers = [];
+
 				PhantomRenderer.Log.i("Listening for new task");
 				PhantomRenderer.Net.next();
 			});
@@ -69,9 +77,12 @@ var PhantomRenderer = {
 					PhantomRenderer.Log.i("Content-Length: " + data.content.length);
 
 					data.metadata = {};
-					data.headers = [];
+					data.headers = PhantomRenderer.Task.headers;
 
 					PhantomRenderer.Net.store(data);
+
+					PhantomRenderer.Task.page.close();
+					PhantomRenderer.Task.page = null;
 					break;				
 			}
 		},
@@ -80,12 +91,34 @@ var PhantomRenderer = {
 			// retry
 			PhantomRenderer.Net.next();
 		},
+		responseListener : function(response) {
+			PhantomRenderer.Log.i("Response from " + response.url);
+
+			if(response.url == PhantomRenderer.Task.url) {
+		    	PhantomRenderer.Task.headers = response.headers;
+		    }
+		},
+		navigationListener : function(url, type, willNavigate, main) {
+			PhantomRenderer.Log.d("Navigation request to " + url + "; type: " + type +
+				", willNavigate: " + willNavigate + "; main: " + main);
+
+			// Handling page redirection
+			if(main) {
+				PhantomRenderer.Task.url = url;
+			}
+		},		
 
 		render : function(task) {
 			var page = Page.create();
 
+			PhantomRenderer.Task.page = page;
+
 			page.onCallback = PhantomRenderer.Renderer.callbackListener;
+			page.onResourceReceived = PhantomRenderer.Renderer.responseListener;
+			page.onNavigationRequested = PhantomRenderer.Renderer.navigationListener;
 			page.open(task.url, function(status) {
+				PhantomRenderer.Log.i("Page loaded with status " + status);
+
 				if(status === 'success') {
 					page.evaluateJavaScript(task.rule.clientScript);
 				}
