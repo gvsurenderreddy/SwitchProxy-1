@@ -1,5 +1,6 @@
 var Page = require('webpage');
 var system = require('system');
+require('./date.js');
 
 var PhantomRenderer = {
 	Config : {
@@ -9,12 +10,21 @@ var PhantomRenderer = {
 	},
 
 	Log : {
+		_date : function () {
+			return new Date().toString('yyyy-MM-dd HH:mm:ss');
+		},
 		i : function(msg) {
-			console.log("INFO:" + msg);
+			console.log(PhantomRenderer.Log._date() + "|INFO: " + msg);
 		},
 		d : function(msg) {
-			console.log("DEBUG:" + msg);
-		}
+			console.log(PhantomRenderer.Log._date() + "|DEBUG: " + msg);
+		},
+		e : function(msg) {
+			console.log(PhantomRenderer.Log._date() + "|ERROR: " + msg);
+		},
+		w : function(msg) {
+			console.log(PhantomRenderer.Log._date() + "|WARN: " + msg);
+		}		
 	},
 
 	Task : {
@@ -70,7 +80,7 @@ var PhantomRenderer = {
 		callbackListener : function(data) {
 			switch(data.type) {
 				case 'log':
-					PhantomRenderer.Log.i("From page context: " + data.content);
+					PhantomRenderer.Log.i("FROM PAGE: " + data.content);
 					break;
 				case 'commit':
 					PhantomRenderer.Log.i("Received commit call.");
@@ -83,12 +93,16 @@ var PhantomRenderer = {
 
 					PhantomRenderer.Task.page.close();
 					PhantomRenderer.Task.page = null;
+					PhantomRenderer.Log.i("Page closed.");
 					break;				
 			}
 		},
 		errorListener : function(msg, trace) {
-			PhantomRenderer.Log.i("Error occured: " + msg);
-			// retry
+			PhantomRenderer.Log.e("Error occured: " + msg);
+
+			// WHAT TO DO NOW:
+			// * retry
+			// * return error
 			PhantomRenderer.Net.next();
 		},
 		responseListener : function(response) {
@@ -116,10 +130,13 @@ var PhantomRenderer = {
 			page.onCallback = PhantomRenderer.Renderer.callbackListener;
 			page.onResourceReceived = PhantomRenderer.Renderer.responseListener;
 			page.onNavigationRequested = PhantomRenderer.Renderer.navigationListener;
+
+			PhantomRenderer.Log.i("Opening page at url: " + PhantomRenderer.Task.current.url);
 			page.open(task.url, function(status) {
 				PhantomRenderer.Log.i("Page loaded with status " + status);
 
 				if(status === 'success') {
+					PhantomRenderer.Log.i("Running task script..");
 					page.evaluateJavaScript(task.rule.clientScript);
 				}
 			});
