@@ -40,20 +40,24 @@ var PhantomRenderer = {
 			var p = Page.create();
 
 			p.open(PhantomRenderer.Config.URL_GET, function(status) {
-				var task = JSON.parse(p.plainText);
-
+				var rawContent = p.plainText;
 				p.close();
+			
+				if(status === 'success') {
+					var task = JSON.parse(rawContent);
 
-				if(task.valid) {
-					PhantomRenderer.Log.i("New task: " + task.id + "; URL: " + task.url);
+					if(task.valid) {
+						PhantomRenderer.Log.i("New task: " + task.id + "; URL: " + task.url);
 
-					PhantomRenderer.Task.current = task;
+						PhantomRenderer.Task.current = task;
 
-					PhantomRenderer.Renderer.render(task);
+						PhantomRenderer.Renderer.render(task);
+						
+						return;
+					}
 				}
-				else {
-					setTimeout(PhantomRenderer.Net.next, PhantomRenderer.Config.POLL_INTERVAL);
-				}
+
+				setTimeout(PhantomRenderer.Net.next, PhantomRenderer.Config.POLL_INTERVAL);
 			});
 		},
 		store : function(data) {
