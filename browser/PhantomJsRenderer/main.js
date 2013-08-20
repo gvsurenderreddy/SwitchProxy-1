@@ -2,6 +2,7 @@ var Page = require('webpage');
 var system = require('system');
 
 require('./date.js');
+var R = require('./base64v1_0.js');
 
 var PhantomRenderer = {
 	Config : {
@@ -62,16 +63,28 @@ var PhantomRenderer = {
 		},
 		store : function(data) {
 			task = PhantomRenderer.Task.current;
-			PhantomRenderer.Log.i("Storing: " + task.id + "; URL: " + task.url);
+			PhantomRenderer.Log.i("Preparing: " + task.id + "; URL: " + task.url);
 
 			var req = Page.create();
+			req.customHeaders = {
+				'Content-Type' : 'application/json; charset=utf-8',
+				'Content-Transfer-Encoding' : 'base64'
+			};
 
-			req.open(PhantomRenderer.Config.URL_GET, 'POST', JSON.stringify({
+			PhantomRenderer.Log.i("Encoding to JSON");
+			var jsonData = JSON.stringify({
 				"content"	: data.content,
 				"id"		: PhantomRenderer.Task.current.id,
 				"headers"	: data.headers,
 				"metadata"	: data.metadata
-			}), function(status) {
+			});
+
+			PhantomRenderer.Log.i("Encoding to base64");
+			var base64Data = phantom.B64.encode(jsonData);
+
+			PhantomRenderer.Log.i("Storing..");
+
+			req.open(PhantomRenderer.Config.URL_GET, 'POST', base64Data, function(status) {
 				PhantomRenderer.Log.i("Content stored: " + status);
 
 				req.close();
