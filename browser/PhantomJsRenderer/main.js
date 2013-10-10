@@ -6,9 +6,12 @@ var R = require('./base64v1_0.js');
 
 var PhantomRenderer = {
 	Config : {
-		URL_GET : 'http://localhost:8080/SwitchProxy/renderer-interface',
-		URL_STORE : 'http://localhost:8080/SwitchProxy/renderer-interface',
-		POLL_INTERVAL : 1000
+		URL_GET : 'http://localhost:9080/SwitchProxy/renderer-interface',
+		URL_STORE : 'http://localhost:9080/SwitchProxy/renderer-interface',
+		POLL_INTERVAL : 1000,
+
+		PROCESSING_TIMEOUT : 10*60*1000,
+		PROCESSING_TIMEOUT_RETRY : 3
 	},
 
 	Log : {
@@ -33,7 +36,10 @@ var PhantomRenderer = {
 		current : null,
 		headers : [],
 		page : null,
-		url : null
+		url : null,
+
+		retry : 0,
+		retryTimeoutId : null
 	},
 
 	Net : {
@@ -95,6 +101,35 @@ var PhantomRenderer = {
 				PhantomRenderer.Log.i("Listening for new task..");
 				PhantomRenderer.Net.next();
 			});
+		},
+		cancel : function(reason) {
+			var task = PhantomRenderer.Task.current;
+
+			PhantomRenderer.Log.i("Canceling: " + task.id + "; URL: " + task.url + ", due: " + reason);
+
+			var req = Page.create();
+			req.customHeaders = {
+				'Content-Type' : 'application/json; charset=utf-8'
+			};
+
+			var jsonData = JSON.stringify({
+				"content"	: "canceled due: " + reason,
+				"id"		: task.id,
+				"headers"	: [],
+				"metadata"	: {}
+			});
+
+			req.open(PhantomRenderer.Config.URL_GET, 'POST', jsonData, function(status) {
+				PhantomRenderer.Log.i("Task canceled: " + status);
+
+				req.close();
+
+				PhantomRenderer.Task.current = null;
+				PhantomRenderer.Task.headers = [];
+
+				PhantomRenderer.Log.i("Listening for new task..");
+				PhantomRenderer.Net.next();
+			});			
 		}
 	},
 
@@ -109,6 +144,9 @@ var PhantomRenderer = {
 					break;
 				case 'commit':
 					PhantomRenderer.Log.i("Received commit call.");
+
+					PhantomRenderer.Monitor.stop();
+
 					PhantomRenderer.Log.i("Content-Length: " + data.content.length);
 
 					data.metadata = {};
@@ -124,6 +162,10 @@ var PhantomRenderer = {
 		},
 		errorListener : function(msg, trace) {
 			PhantomRenderer.Log.e("Error occured: " + msg);
+
+			PhantomRenderer.Task.page.close();
+			PhantomRenderer.Task.page = null;
+			PhantomRenderer.Log.i("Page closed.");
 
 			// WHAT TO DO NOW:
 			// * retry
@@ -145,9 +187,13 @@ var PhantomRenderer = {
 			if(main) {
 				PhantomRenderer.Task.url = url;
 			}
-		},		
+		},
 
 		render : function(task) {
+			if(PhantomRenderer.Task.page != null) {
+				PhantomRenderer.Task.page.close();
+			}
+
 			var page = Page.create();
 
 			PhantomRenderer.Task.page = page;
@@ -165,9 +211,46 @@ var PhantomRenderer = {
 					page.injectJs('./pageapi.js');
 
 					PhantomRenderer.Log.i("Running task script..");
+
+					PhantomRenderer.Monitor.start();
+
 					page.evaluateJavaScript(task.rule.clientScript);
 				}
 			});
+		}
+	},
+
+	Monitor : {
+		start : function() {
+			PhantomRenderer.Log.d("Setting timeout");
+
+			PhantomRenderer.Task.retryTimeoutId = 
+				setTimeout(PhantomRenderer.Monitor.retry, PhantomRenderer.Config.PROCESSING_TIMEOUT);
+		},
+		retry : function() {
+			PhantomRenderer.Log.w("Timeout occured");
+
+			PhantomRenderer.Task.page.close();
+			PhantomRenderer.Task.page = null;
+			PhantomRenderer.Log.i("Page closed.");
+			
+			if(++PhantomRenderer.Task.retry < PhantomRenderer.Config.PROCESSING_TIMEOUT_RETRY) {
+				PhantomRenderer.Log.w("Retrying(" + PhantomRenderer.Task.retry + ")...");
+
+				PhantomRenderer.Renderer.render(PhantomRenderer.Task.current);
+			}
+			else {
+				PhantomRenderer.Monitor.stop();
+
+				PhantomRenderer.Net.cancel("Max retries.");
+			}
+		},
+		stop : function() {
+			PhantomRenderer.Log.d("Clearing timeout");
+
+			clearTimeout(PhantomRenderer.Task.retryTimeoutId);
+			PhantomRenderer.Task.retry = 0;
+			PhantomRenderer.Task.retryTimeoutId = null;
 		}
 	}
 };
