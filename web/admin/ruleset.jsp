@@ -92,10 +92,17 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<link type="text/css" rel="Stylesheet" href="../res/codemirror.css" />
+		<link type="text/css" rel="Stylesheet" href="../res/ui-lightness/jquery-ui-1.10.3.custom.css" />
+		
 		<script type="text/javascript" src="../res/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="../res/codemirror.js"></script>
+		<script type="text/javascript" src="../res/codemirror/javascript.js"></script>
+		<script type="text/javascript" src="../res/jquery-ui-1.10.3.custom.js"></script>
 		<script type="text/javascript">
 			// from: http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
-			$(document).delegate('textarea', 'keydown', function(e) {
+			/*$(document).delegate('textarea', 'keydown', function(e) {
 				var keyCode = e.keyCode || e.which;
 
 				if (keyCode == 9) {
@@ -112,6 +119,21 @@
 				  $(this).get(0).selectionStart =
 				  $(this).get(0).selectionEnd = start + 1;
 				}
+			 });*/
+			 
+			 $(window).load(function () {
+				var editor = CodeMirror.fromTextArea($('textarea')[0], {
+				  mode: "text/javascript",
+				  lineNumbers : true
+				});
+				
+				setTimeout(function() {
+					$('.CodeMirror').resizable({
+					resize: function() {
+					  editor.setSize($(this).width(), $(this).height());
+					}
+				 });
+				}, 1000);
 			 });
 		</script>
 		<style>
@@ -137,6 +159,9 @@
 			th {
 				background: #898989;
 				color:white;
+			}
+			.CodeMirror {
+				border: 1px solid black;
 			}
 			
 		</style>
