@@ -87,7 +87,10 @@
 						
 						%>
 						<tr>
-							<td><a href="task-content.jsp?index=<%= index++ %>">Ogled vsebine</a></td>
+							<td>
+								<a href="task-content.jsp?index=<%= index %>">View content</a>
+								(<a href="task-content-raw.jsp?index=<%= index++ %>">as plain-text</a>)
+							</td>
 							<td><%= t.getId() %></td>
 							<td><%= dateFormat.format(created) %></td>
 							<td><%= dateFormat.format(commited) %></td>
