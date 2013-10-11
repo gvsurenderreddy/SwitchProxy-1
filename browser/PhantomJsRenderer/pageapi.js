@@ -73,6 +73,36 @@ var PhantomRenderer = {
 		catch(e) {
 			PhantomRenderer.apiLog(e.toString());
 		}
-	}
+	},
+
+	pausedExecution : null,
+	resumeExecution : function() {
+		PhantomRenderer.apiLog("Resumed execution(calling back) inside page context");
+
+		if(PhantomRenderer.pausedExecution != null) {
+			PhantomRenderer.pausedExecution();
+			PhantomRenderer.pausedExecution = null;
+		}
+		else {
+			PhantomRenderer.apiLog("ERR: callback pausedExecution not defined.");
+		}
+	},
+	includeJavascript : function(url, callback) {
+		PhantomRenderer.apiLog("Including in page [PAGE] --> SRV: " + url);
+
+		PhantomRenderer.pausedExecution = callback;
+		window.callPhantom({
+			type : 'include-js',
+			content : url
+		});
+	},
+	injectJquery : function(callback) {
+		PhantomRenderer.apiLog("Injecting jquery into page [PAGE] --> SRV");
+
+		PhantomRenderer.pausedExecution = callback;
+		window.callPhantom({
+			type : 'inject-jquery'
+		});
+	}	
 
 };

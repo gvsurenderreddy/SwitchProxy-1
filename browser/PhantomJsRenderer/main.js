@@ -6,13 +6,16 @@ var R = require('./base64v1_0.js');
 
 var PhantomRenderer = {
 	Config : {
-		URL_GET : 'http://localhost:9080/SwitchProxy/renderer-interface',
-		URL_STORE : 'http://localhost:9080/SwitchProxy/renderer-interface',
+		URL_GET : 'http://localhost:8080/SwitchProxy/renderer-interface',
+		URL_STORE : 'http://localhost:8080/SwitchProxy/renderer-interface',
 		POLL_INTERVAL : 1000,
 
 		PROCESSING_TIMEOUT : 10*60*1000,
-		PROCESSING_TIMEOUT_RETRY : 3
+		PROCESSING_TIMEOUT_RETRY : 3,
+		MAX_TASKS_PER_SESSION : 50
 	},
+	
+	taskCount : 0,
 
 	Log : {
 		_date : function () {
@@ -98,6 +101,11 @@ var PhantomRenderer = {
 				PhantomRenderer.Task.current = null;
 				PhantomRenderer.Task.headers = [];
 
+				if(PhantomRenderer.taskCount++ > PhantomRenderer.Config.MAX_TASKS_PER_SESSION) {
+					PhantomRenderer.Log.i("Ending session after " + PhantomRenderer.taskCount);
+					phantom.exit();
+				}
+				
 				PhantomRenderer.Log.i("Listening for new task..");
 				PhantomRenderer.Net.next();
 			});
@@ -141,6 +149,25 @@ var PhantomRenderer = {
 					break;				
 				case 'log':
 					PhantomRenderer.Log.i("FROM PAGE: " + data.content);
+					break;
+				case 'include-js':
+					PhantomRenderer.Log.i("Including in page PAGE --> [SRV]: " + data.content);
+
+					PhantomRenderer.Task.page.includeJs(data.content, function() {
+						PhantomRenderer.Log.i("Including successful");
+
+
+					});
+					break;
+				case 'inject-jquery':
+					PhantomRenderer.Log.i("Injecting jquery into page PAGE --> [SRV]");
+
+					PhantomRenderer.Task.page.injectJs('./jquery-latest.js');
+
+					PhantomRenderer.Task.page.evaluate(function() {
+						PhantomRenderer.apiLog("Calling back to resume execution");
+						PhantomRenderer.resumeExecution();
+					});					
 					break;
 				case 'commit':
 					PhantomRenderer.Log.i("Received commit call.");
@@ -216,6 +243,8 @@ var PhantomRenderer = {
 
 					page.evaluateJavaScript(task.rule.clientScript);
 				}
+
+				// TODO what if fails!
 			});
 		}
 	},
