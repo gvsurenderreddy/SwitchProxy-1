@@ -19,6 +19,7 @@
 		<title>Task queue</title>
 	</head>
 	<body>
+		<%@include file="header.jsp" %>
 		<button onclick="location.href='?action=takenext'">Take next</button>
 		<hr>
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">

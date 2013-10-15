@@ -30,6 +30,7 @@
 		<title>Active tasks</title>
 	</head>
 	<body>
+		<%@include file="header.jsp" %>
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">
 			<thead>
 				<tr>

@@ -21,6 +21,7 @@
 		<title>JSP Page</title>
 	</head>
 	<body>
+		<%@include file="header.jsp" %>
 		<button onclick="location.href='?action=stop'">Stop</button>
 	</body>
 </html>

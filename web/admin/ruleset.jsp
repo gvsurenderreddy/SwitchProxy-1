@@ -148,6 +148,7 @@
 		<title>Ruleset</title>
 	</head>
 	<body>
+		<%@include file="header.jsp" %>
 		<h2>Ruleset</h2>
 		<table border="1" cellspacing="0" width="100%">
 			<thead>

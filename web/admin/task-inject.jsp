@@ -47,6 +47,7 @@
 		</style>		
 	</head>
 	<body>
+		<%@include file="header.jsp" %>
 		<%
 		
 			String url = request.getParameter("url");

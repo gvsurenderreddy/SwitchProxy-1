@@ -37,6 +37,9 @@
 				<a href="../proxy?action=main-jhttpp2">Start jHTTPp2</a><br>
 				Starts proxy
 			</li>
+			<li>
+				<a href="proxy-man.jsp">Proxy manager</a><br>
+			</li>			
 		</ul>
 		
 	</body>

@@ -54,6 +54,7 @@
 		</style>		
 	</head>
 	<body>
+		<%@include file="header.jsp" %>
 		Showing: <%= commitedTasks.size() %> of max <%= ProxyRequestFilterSingleton.getInstance().getCommitedTasksMaxSize() %>
 		<button onclick="location.href='?action=clear'">Clear</button>
 		<hr>
