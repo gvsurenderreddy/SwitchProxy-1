@@ -54,7 +54,7 @@
 			if(url == null) url = "";
 			String script = request.getParameter("script");
 			if(script == null) script =
-			"{\n\tpageLoad: function() {\n\t\tPhantomRendererAPI.commit({});\n\t}\n}";
+			"{\n\tonPageLoaded: function() {\n\t\tPhantomRendererAPI.commit({});\n\t}\n}";
 			
 			if(request.getMethod().equals("POST")) {
 				ProxyRequestFilterSingleton.getInstance().getTaskQueue().add(
