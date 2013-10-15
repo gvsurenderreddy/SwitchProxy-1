@@ -57,7 +57,7 @@ public class ProxyServlet extends HttpServlet {
 	}
 	
 	protected void startJhttpp2Proxy(ServletContext ctx) {
-		Jhttpp2Server	server = new Jhttpp2Server();
+		Jhttpp2Server server = new Jhttpp2Server();
 		server.SERVER_PROPERTIES_FILE = ctx.getRealPath("WEB-INF/jhttpp2/server.properties");
 		server.DATA_FILE = ctx.getRealPath("WEB-INF/jhttpp2/server.data");
 		server.MAIN_LOGFILE = ctx.getRealPath("WEB-INF/jhttpp2/server.log");
@@ -68,6 +68,7 @@ public class ProxyServlet extends HttpServlet {
 			System.out.println("Error: " +  server.getErrorMessage());
 		}
 		else {
+			ProxyInstance.instance = server;
 			new Thread(server).start();
 				System.out.println("Running on port " + server.port);
 		}

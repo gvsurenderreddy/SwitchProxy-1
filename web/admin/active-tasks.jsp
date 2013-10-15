@@ -34,6 +34,7 @@
 			<thead>
 				<tr>
 					<th witdh="200">UUID</th>
+					<th witdh="200">Created</th>
 					<th>Task description</th>
 					<th></th>
 				</tr>
@@ -42,11 +43,14 @@
 				<%
 
 					Hashtable<String, RenderTask> hs = ProxyRequestFilterSingleton.getInstance().getActiveTasks();
-					for(Map.Entry e : hs.entrySet()) {
+					for(Map.Entry<String, RenderTask> e : hs.entrySet()) {
+						RenderTask rt = e.getValue();
+						
 						%>
 						<tr>
 							<td><%= e.getKey()%></td>
-							<td><%= e.getValue()%></td>
+							<td><%= rt.getCreateDate() %></td>
+							<td><%= rt %></td>
 							<td><a href="?action=cancel&uuid=<%= e.getKey()%>">Cancel</a></td>
 						</tr>
 						<%
