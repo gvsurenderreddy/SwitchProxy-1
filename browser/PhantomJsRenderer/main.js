@@ -165,8 +165,8 @@ var PhantomRenderer = {
 					PhantomRenderer.Task.page.injectJs('./jquery-latest.js');
 
 					PhantomRenderer.Task.page.evaluate(function() {
-						PhantomRenderer.apiLog("Calling back to resume execution");
-						PhantomRenderer.resumeExecution();
+						PhantomRendererAPI.apiLog("Calling back to resume execution");
+						PhantomRendererAPI.resumeExecution();
 					});					
 					break;
 				case 'commit':
@@ -221,6 +221,10 @@ var PhantomRenderer = {
 				PhantomRenderer.Task.page.close();
 			}
 
+			// reconstruct task data
+			var script = null;
+			eval('script = ' + task.rule.clientScript);
+
 			var page = Page.create();
 
 			PhantomRenderer.Task.page = page;
@@ -228,6 +232,9 @@ var PhantomRenderer = {
 			page.onCallback = PhantomRenderer.Renderer.callbackListener;
 			page.onResourceReceived = PhantomRenderer.Renderer.responseListener;
 			page.onNavigationRequested = PhantomRenderer.Renderer.navigationListener;
+			if(typeof script.onResourceRequested === 'function') {
+				page.onResourceRequested = script.onResourceRequested;
+			}
 
 			PhantomRenderer.Log.i("Opening page at url: " + PhantomRenderer.Task.current.url);
 			page.open(task.url, function(status) {
@@ -241,7 +248,7 @@ var PhantomRenderer = {
 
 					PhantomRenderer.Monitor.start();
 
-					page.evaluateJavaScript(task.rule.clientScript);
+					page.evaluate(script.onPageLoaded);
 				}
 
 				// TODO what if fails!

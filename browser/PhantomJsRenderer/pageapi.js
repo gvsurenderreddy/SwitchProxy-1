@@ -6,7 +6,7 @@
  /**
   * Pass serialized DOM to extension, which then send content to Proxy server
   */
-var PhantomRenderer = {
+var PhantomRendererAPI = {
 	apiLog : function(message) {
 		window.callPhantom({ type: 'api-log', content : message });
 	},
@@ -41,13 +41,13 @@ var PhantomRenderer = {
 
 	commit : function(options) {
 		try {
-			PhantomRenderer.apiLog("Starting commit..");
+			PhantomRendererAPI.apiLog("Starting commit..");
 
-			PhantomRenderer.apiLog("Packing(DOM serialization)..");
+			PhantomRendererAPI.apiLog("Packing(DOM serialization)..");
 			var data = {
 				type 		: 'commit',
 				url 		: location.href,
-				content		: PhantomRenderer.serializeDOM(),
+				content		: PhantomRendererAPI.serializeDOM(),
 				headers		: [],
 				metadata	: {}
 			}
@@ -55,51 +55,51 @@ var PhantomRenderer = {
 			if(options != null) {
 				// Post process Serialized DOM
 				if( (typeof options.processHTML === 'function') ) {
-					PhantomRenderer.apiLog("Executin serialization Post-process function..");
+					PhantomRendererAPI.apiLog("Executin serialization Post-process function..");
 					data.content = options.processHTML(data.content);
 				}
 				// todo metadata
 				if(options.metadata != null) {
-					PhantomRenderer.apiLog("Appending meta data.");
+					PhantomRendererAPI.apiLog("Appending meta data.");
 					//append
 					data.metadata = options.metadata;
 				}
 			}
 
-			PhantomRenderer.apiLog("Sending message..");
+			PhantomRendererAPI.apiLog("Sending message..");
 
 			window.callPhantom(data);
 		}
 		catch(e) {
-			PhantomRenderer.apiLog(e.toString());
+			PhantomRendererAPI.apiLog(e.toString());
 		}
 	},
 
 	pausedExecution : null,
 	resumeExecution : function() {
-		PhantomRenderer.apiLog("Resumed execution(calling back) inside page context");
+		PhantomRendererAPI.apiLog("Resumed execution(calling back) inside page context");
 
-		if(PhantomRenderer.pausedExecution != null) {
-			PhantomRenderer.pausedExecution();
-			PhantomRenderer.pausedExecution = null;
+		if(PhantomRendererAPI.pausedExecution != null) {
+			PhantomRendererAPI.pausedExecution();
+			PhantomRendererAPI.pausedExecution = null;
 		}
 		else {
-			PhantomRenderer.apiLog("ERR: callback pausedExecution not defined.");
+			PhantomRendererAPI.apiLog("ERR: callback pausedExecution not defined.");
 		}
 	},
 	includeJavascript : function(url, callback) {
-		PhantomRenderer.apiLog("Including in page [PAGE] --> SRV: " + url);
+		PhantomRendererAPI.apiLog("Including in page [PAGE] --> SRV: " + url);
 
-		PhantomRenderer.pausedExecution = callback;
+		PhantomRendererAPI.pausedExecution = callback;
 		window.callPhantom({
 			type : 'include-js',
 			content : url
 		});
 	},
 	injectJquery : function(callback) {
-		PhantomRenderer.apiLog("Injecting jquery into page [PAGE] --> SRV");
+		PhantomRendererAPI.apiLog("Injecting jquery into page [PAGE] --> SRV");
 
-		PhantomRenderer.pausedExecution = callback;
+		PhantomRendererAPI.pausedExecution = callback;
 		window.callPhantom({
 			type : 'inject-jquery'
 		});
