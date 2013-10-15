@@ -14,28 +14,37 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>JSP Page</title>
+		
+		<link type="text/css" rel="Stylesheet" href="../res/codemirror.css" />
+		<link type="text/css" rel="Stylesheet" href="../res/ui-lightness/jquery-ui-1.10.3.custom.css" />
+		
 		<script type="text/javascript" src="../res/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="../res/codemirror.js"></script>
+		<script type="text/javascript" src="../res/codemirror/javascript.js"></script>
+		<script type="text/javascript" src="../res/jquery-ui-1.10.3.custom.js"></script>
 		<script type="text/javascript">
-			// from: http://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea
-			$(document).delegate('textarea', 'keydown', function(e) {
-				var keyCode = e.keyCode || e.which;
-
-				if (keyCode == 9) {
-				  e.preventDefault();
-				  var start = $(this).get(0).selectionStart;
-				  var end = $(this).get(0).selectionEnd;
-
-				  // set textarea value to: text before caret + tab + text after caret
-				  $(this).val($(this).val().substring(0, start)
-								  + "\t"
-								  + $(this).val().substring(end));
-
-				  // put caret at right position again
-				  $(this).get(0).selectionStart =
-				  $(this).get(0).selectionEnd = start + 1;
-				}
+			 $(window).load(function () {
+				var editor = CodeMirror.fromTextArea($('textarea')[0], {
+				  mode: "text/javascript",
+				  lineNumbers : true
+				});
+				
+				setTimeout(function() {
+					$('.CodeMirror').resizable({
+					resize: function() {
+					  editor.setSize($(this).width(), $(this).height());
+					}
+				 });
+				}, 1000);
 			 });
-		</script>		
+		</script>
+		<style>
+
+			.CodeMirror {
+				border: 1px solid black;
+			}
+			
+		</style>		
 	</head>
 	<body>
 		<%
@@ -43,22 +52,22 @@
 			String url = request.getParameter("url");
 			if(url == null) url = "";
 			String script = request.getParameter("script");
-			if(script == null) script = "";
+			if(script == null) script =
+			"{\n\tpageLoad: function() {\n\t\tPhantomRendererAPI.commit({});\n\t}\n}";
 			
-			
-		if(request.getMethod().equals("POST")) {
-			ProxyRequestFilterSingleton.getInstance().getTaskQueue().add(
-				new RenderTask(
-					  url,
-					  new UrlMatchRule(
-							"injection",
-							script)));
-			
-			%>
-			Injected!
-			<hr>
-			<%
-		}
+			if(request.getMethod().equals("POST")) {
+				ProxyRequestFilterSingleton.getInstance().getTaskQueue().add(
+					new RenderTask(
+						  url,
+						  new UrlMatchRule(
+								"injection",
+								script)));
+
+				%>
+				Injected!
+				<hr>
+				<%
+			}
 		
 		%>
 		<form method="post">
@@ -67,5 +76,23 @@
 			<textarea name="script" cols="100" rows="20"><%= script %></textarea><br>
 			<input type="submit">
 		</form>
+		<h3>Page context API</h3>
+		<pre>
+PhantomRendererAPI = {
+	log : function(message),
+	commit : function(options = {
+		processHTML : function(html) { return html; },
+		metadata : [{k:v},{k:v}...]
+	})
+}
+		</<pre>
+<h3>Client Script structure</h3><pre>
+{
+	injectJquery : true|false,
+
+	onPageLoaded : function(),
+	onResourceRequested : <a target="_blank" href="https://github.com/ariya/phantomjs/wiki/API-Reference-WebPage#wiki-webpage-onResourceRequested">function(requestData, networkRequest)</a>
+}
+		</<pre>
 	</body>
 </html>
