@@ -63,12 +63,13 @@ public class ProxyServlet extends HttpServlet {
 		server.MAIN_LOGFILE = ctx.getRealPath("WEB-INF/jhttpp2/server.log");
 		server.log_access_filename = ctx.getRealPath("WEB-INF/jhttpp2/access.log");
 		server.init();
+		
+		ProxyInstance.instance = server;
 
 		if (server.fatalError) {
 			System.out.println("Error: " +  server.getErrorMessage());
 		}
 		else {
-			ProxyInstance.instance = server;
 			new Thread(server).start();
 				System.out.println("Running on port " + server.port);
 		}

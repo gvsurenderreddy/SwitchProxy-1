@@ -24,6 +24,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Jhttpp2Server implements Runnable {
 
@@ -499,6 +501,19 @@ public class Jhttpp2Server implements Runnable {
 	public void shutdownServer() {
 		closeLog();
 		System.exit(0);
+	}
+	
+	public void stop() {
+		System.out.println("Stoping proxy!");
+		
+		closeLog();
+		serverRunning = false;
+		try {
+			listen.close();
+		}
+		catch (IOException ex) {
+			Logger.getLogger(Jhttpp2Server.class.getName()).log(Level.SEVERE, null, ex);
+		}
 	}
 
 }

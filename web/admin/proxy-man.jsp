@@ -9,7 +9,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
 	if("stop".equals(request.getParameter("action"))) {
-		((Jhttpp2Server)ProxyInstance.instance).shutdownServer();
+		((Jhttpp2Server)ProxyInstance.instance).stop();
 		
 		response.sendRedirect("proxy-man.jsp");
 	}
@@ -22,6 +22,7 @@
 	</head>
 	<body>
 		<%@include file="header.jsp" %>
+		Proxy running: <%= ProxyInstance.instance %> 
 		<button onclick="location.href='?action=stop'">Stop</button>
 	</body>
 </html>
