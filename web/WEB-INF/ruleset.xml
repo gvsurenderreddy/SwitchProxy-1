@@ -1,2 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ruleset />
+<ruleset>
+   <rule>
+      <url-pattern>^http://www.twitter.com/[0-9A-z_]+/status/[0-9]+$</url-pattern>
+      <client-script xml:space="preserve">{
+           onPageLoaded : function() {
+             PhantomRendererAPI.commit({
+               processHTML : function(html) {
+                 return "&lt;!DOCTYPE html&gt;\n" + html;
+               }
+             });
+           }
+         }</client-script>
+   </rule>
+   <rule>
+      <url-pattern>^http://www.twitter.com/[0-9A-z_]+/?$</url-pattern>
+      <client-script xml:space="preserve">{
+                    onPageLoaded : function() {
+                      var nodeCount = $('*').length;
+                      
+                      var commit = function() {
+                        PhantomRendererAPI.log("Commiting..");
+                        
+                        PhantomRendererAPI.commit({
+                          processHTML : function(html) {
+                            return "&lt;!DOCTYPE html&gt;\n" + html;
+                          }
+                        });
+                        PhantomRendererAPI.log("Done!");			               
+                      }
+                      var executeScroll = function() {
+                        var rndOffset = Math.round(Math.random() * 100);
+                        var offset = document.height - window.innerHeight;
+                        window.scrollTo(0, offset - rndOffset );
+                        
+                        setTimeout(scroll, 500);               
+                      }
+                           
+                      var scroll = function() {
+                        if(!$('.GridTimeline-end').hasClass('has-more-items')) {
+                          PhantomRendererAPI.log("End of stream pops out. Waiting 10s..");
+                          
+                          // reassure content hasn't changed ie. more tweets loaded
+                          setTimeout(function() {
+                            if($('*').length == nodeCount) {
+                              PhantomRendererAPI.log("No changes.");
+                              
+                              commit();
+                            }
+                            else {
+                              PhantomRendererAPI.log("Content changed.");
+                              
+                              nodeCount = $('*').length;
+                              executeScroll();
+                            }
+                          }, 10000);
+                        }
+                        else {
+         					executeScroll();
+                        }   
+                      }
+                      
+                      scroll();
+                      
+                    }
+                  }</client-script>
+   </rule>
+   <rule>
+      <url-pattern>^http://www.facebook.com/[A-z]+$</url-pattern>
+      <client-script xml:space="preserve">{
+         	injectJquery : true,
+         
+         	onPageLoaded  : function() {
+         		var scroll = function() {
+         			if(
+         				! $('h3.uiHeaderTitle').filter(function() {
+         					return this.innerHTML == 'Founded';
+         				} )	.parents('.fbTimelineTimePeriod')
+         					.hasClass('fbTimelineTimePeriodUnexpanded', 'fbTimelineSectionLoading')
+         				) {
+         				
+         				PhantomRendererAPI.log("Last time period expanded - Founded");
+         			
+         				PhantomRendererAPI.commit({
+         					processHTML : function(html) {
+         						return "&lt;!DOCTYPE html&gt;\n" + html;
+         					}
+         				});
+         				PhantomRendererAPI.log("Done!");			
+         			}
+         			else {
+         				PhantomRendererAPI.log("Scrolling down.");
+                       
+                       	// expand
+                       	$('.UFIPagerLink').each(function() { this.click() } );
+                       	$('.UFICommentLink').each(function() { this.click() } );
+         
+         				var rndOffset = Math.round(Math.random() * 100);
+         				var offset = document.height - window.innerHeight;
+         				window.scrollTo(0, offset - rndOffset );
+                       
+         				setTimeout(scroll, 500);
+         			}   
+         		}
+         		 
+         		scroll();
+          	},
+         	onResourceRequested : function(requestData, networkRequest) {
+         		if(requestData.id == 1) {
+         			networkRequest.changeUrl(requestData.url.replace('http:', 'https:'));
+         		}
+         	}
+         
+          }</client-script>
+   </rule>
+   <rule>
+      <url-pattern>^http://www.facebook.com/notes/.*</url-pattern>
+      <client-script xml:space="preserve">{
+         	onPageLoaded  : function() {
+         	
+               PhantomRendererAPI.commit({
+                 processHTML : function(html) {
+                   return "&lt;!DOCTYPE html&gt;\n" + html;
+                 }
+               });
+               PhantomRendererAPI.log("Done!");			
+         
+          	},
+         	onResourceRequested : function(requestData, networkRequest) {
+         		if(requestData.id == 1) {
+         			networkRequest.changeUrl(requestData.url.replace('http:', 'https:'));
+         		}
+         	}
+         
+          }</client-script>
+   </rule>
+</ruleset>

@@ -12,7 +12,7 @@ var PhantomRenderer = {
 
 		PROCESSING_TIMEOUT : 10*60*1000,
 		PROCESSING_TIMEOUT_RETRY : 3,
-		MAX_TASKS_PER_SESSION : 50
+		MAX_TASKS_PER_SESSION : 1
 	},
 	
 	taskCount : 0,
@@ -243,6 +243,11 @@ var PhantomRenderer = {
 				if(status === 'success') {
 					PhantomRenderer.Log.i('Injecting API..');
 					page.injectJs('./pageapi.js');
+
+					if(script.injectJquery === true) {
+						page.injectJs('./jquery-latest.js');
+						PhantomRenderer.Log.i("Injected jQuery into page.");
+					}
 
 					PhantomRenderer.Log.i("Running task script..");
 

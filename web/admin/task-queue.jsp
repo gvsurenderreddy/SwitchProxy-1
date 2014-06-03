@@ -8,7 +8,12 @@
 	if("takenext".equals(request.getParameter("action"))) {
 		RenderTask task = ProxyRequestFilterSingleton.getInstance().nextTask();
 				  		
-		response.sendRedirect("queue.jsp");
+		response.sendRedirect("task-queue.jsp");
+	}
+	else if("clearall".equals(request.getParameter("action"))) {
+		ProxyRequestFilterSingleton.getInstance().getTaskQueue().clear();
+		
+		response.sendRedirect("task-queue.jsp");
 	}
 	
 %>
@@ -21,6 +26,7 @@
 	<body>
 		<%@include file="header.jsp" %>
 		<button onclick="location.href='?action=takenext'">Take next</button>
+		<button onclick="if(confirm('Sure?')) { location.href='?action=clearall'; }">Clear all</button>
 		<hr>
 		<table width="100%" cellpadding="10" border="1" cellspacing="0">
 			<thead>
